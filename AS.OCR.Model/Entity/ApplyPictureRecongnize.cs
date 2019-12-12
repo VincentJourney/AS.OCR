@@ -4,7 +4,7 @@ using System;
 namespace AS.OCR.Model.Entity
 {
     [Table("ApplyPictureRecongnize")]
-    public class ApplyPictureRecongnize
+    public class ApplyPictureRecongnize : AbstractEntity
     {
         [ExplicitKey]
         public Guid id { get; set; }

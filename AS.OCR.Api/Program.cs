@@ -18,11 +18,11 @@ namespace AS.OCR.Api
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                        .ConfigureLogging(logging =>
-                        {
-                            logging.AddConsole();
-                            logging.AddFile();
-                        })
+                .ConfigureLogging(logging =>
+                {
+                    logging.AddConsole();
+                    logging.AddFile();
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

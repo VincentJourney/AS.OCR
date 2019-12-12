@@ -25,6 +25,10 @@ namespace AS.OCR.Api.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// 获取天气信息
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {

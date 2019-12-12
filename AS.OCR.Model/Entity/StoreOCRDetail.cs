@@ -3,7 +3,7 @@ using System;
 namespace AS.OCR.Model.Entity
 {
     [Table("StoreOCRDetail")]
-    public class StoreOCRDetail
+    public class StoreOCRDetail : AbstractEntity
     {
         /// <summary>
         /// 规则明细ID

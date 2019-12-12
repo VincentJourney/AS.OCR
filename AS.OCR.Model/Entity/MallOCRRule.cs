@@ -2,7 +2,7 @@
 namespace AS.OCR.Model.Entity
 {
 
-    public class MallOCRRule
+    public class MallOCRRule : AbstractEntity
     {
         /// <summary>
         ///  主键 规则Id

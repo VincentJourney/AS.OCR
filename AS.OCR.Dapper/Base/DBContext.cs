@@ -2,6 +2,7 @@
 using Dapper.Contrib.Extensions;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AS.OCR.Dapper
@@ -115,6 +116,32 @@ namespace AS.OCR.Dapper
         {
             return Db.Update(model);
         }
+
+        /// <summary>
+        /// Model
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="whereStr"></param>
+        /// <returns></returns>
+        public static T GetModel<T>(string whereStr = "")
+        {
+            var sqlCondition = string.IsNullOrWhiteSpace(whereStr) ? "" : $" where {whereStr}";
+            return DbContext.Query<T>($@"SELECT * FROM {typeof(T).Name} {sqlCondition}").FirstOrDefault();
+        }
+
+
+        /// <summary>
+        /// List
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="whereStr"></param>
+        /// <returns></returns>
+        public static List<T> GetList<T>(string whereStr = "")
+        {
+            var sqlCondition = string.IsNullOrWhiteSpace(whereStr) ? "" : $" where {whereStr}";
+            return DbContext.Query<T>($@"SELECT * FROM {typeof(T).Name} {sqlCondition}").ToList();
+        }
+           
     }
 }
 

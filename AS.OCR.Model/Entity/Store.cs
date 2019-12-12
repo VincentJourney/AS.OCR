@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace AS.OCR.Model.Entity
 {
     [Table("Store")]
-    public class Store
+    public class Store : AbstractEntity
     {
         [ExplicitKey]
         public Guid StoreId { get; set; }

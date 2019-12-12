@@ -4,4 +4,14 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.DependencyValidation.Analyzers" Version="0.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AS.OCR.Dapper\AS.OCR.Dapper.csproj" />
+    <ProjectReference Include="..\AS.OCR.Extension.SDK\AS.OCR.Extension.SDK.csproj" />
+    <ProjectReference Include="..\AS.OCR.Model\AS.OCR.Model.csproj" />
+  </ItemGroup>
+
 </Project>

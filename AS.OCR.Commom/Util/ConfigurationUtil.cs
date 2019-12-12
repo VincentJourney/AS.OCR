@@ -40,16 +40,17 @@ namespace AS.OCR.Commom.Util
         public static string RabbitMqPassword => GetConfig<string>("RabbitMq:Password");
 
         //public static string CacheExpiration => GetConfig("CacheExpiration:AllMallOCRRule");
-        //public static string RabbitMqPassword => GetConfig("CacheExpiration:AllStoreOCRDetailRuleList");
+        public static double CacheExpiration_StoreOCRDetailRuleList => GetConfig<double>("CacheExpiration:AllStoreOCRDetailRuleList");
         //public static string RabbitMqPassword => GetConfig("CacheExpiration:StoreOCR");
         //public static string RabbitMqPassword => GetConfig("CacheExpiration:Store");
-        public static decimal CacheExpiration_Company => GetConfig<decimal>("CacheExpiration:Company");
-        public static decimal CacheExpiration_OrgInfo => GetConfig<decimal>("CacheExpiration:OrgInfo");
-        public static decimal CacheExpiration_Mall => GetConfig<decimal>("CacheExpiration:Mall");
+        public static double CacheExpiration_Company => GetConfig<double>("CacheExpiration:Company");
+        public static double CacheExpiration_OrgInfo => GetConfig<double>("CacheExpiration:OrgInfo");
+        public static double CacheExpiration_Mall => GetConfig<double>("CacheExpiration:Mall");
 
         public static bool Exceptionless_Enabled => GetConfig<bool>("Exceptionless:Enabled");
         public static string Exceptionless_ApiKey => GetConfig<string>("Exceptionless:ApiKey");
         public static string Exceptionless_ServerUrl => GetConfig<string>("Exceptionless:ServerUrl");
+
 
 
 

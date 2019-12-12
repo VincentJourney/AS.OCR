@@ -7,11 +7,13 @@
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.30" />
     <PackageReference Include="Dapper.Contrib" Version="2.0.30" />
+    <PackageReference Include="Microsoft.DependencyValidation.Analyzers" Version="0.10.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AS.OCR.Commom\AS.OCR.Commom.csproj" />
+    <ProjectReference Include="..\AS.OCR.Model\AS.OCR.Model.csproj" />
   </ItemGroup>
 
 </Project>

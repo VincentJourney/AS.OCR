@@ -1,18 +1,15 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AS.OCR.Api.Middleware;
 using AS.OCR.Commom.Util;
 using Exceptionless;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
+using System.IO;
 
 namespace AS.OCR.Api
 {
@@ -29,6 +26,21 @@ namespace AS.OCR.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("OCR", new OpenApiInfo
+                {
+                    Title = "OCR API 2.0",
+                    Version = "v2",
+                    Description = "OCR API 2.0"
+                });
+
+                // Set the comments path for the Swagger JSON and UI.
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,6 +55,17 @@ namespace AS.OCR.Api
             ExceptionlessClient.Default.Configuration.ApiKey = ConfigurationUtil.Exceptionless_ApiKey;
             ExceptionlessClient.Default.Configuration.ServerUrl = ConfigurationUtil.Exceptionless_ServerUrl;
             app.UseExceptionless();
+
+            //Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+            //Enable middleware to serve swagger-ui (HTML, JS, CSS etc.), specifying the Swagger JSON endpoint
+            app.UseSwaggerUI(option =>
+            {
+                option.SwaggerEndpoint("/swagger/OCR/swagger.json", "OCR Docs");
+                option.RoutePrefix = string.Empty;
+                option.DocumentTitle = "OCR API";
+            });
+
 
             app.UseHttpsRedirection();
 

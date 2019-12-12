@@ -7,7 +7,7 @@ using Dapper.Contrib.Extensions;
 namespace AS.OCR.Model.Entity
 {
     [Table("ApplyPointOCRResult")]
-    public class ApplyPointOCRResult
+    public class ApplyPointOCRResult : AbstractEntity
     {
         [ExplicitKey]
         public Guid id { get; set; }
