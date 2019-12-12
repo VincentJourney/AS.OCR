@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BaiDuOCR.Attr;
+using AS.OCR.Commom;
+using AS.OCR.Commom.Attributes;
 
-namespace AS.OCR.Model.Entity
+namespace AS.OCR.Model.Business
 {
     public class ReceiptOCR
     {

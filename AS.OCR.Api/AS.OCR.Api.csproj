@@ -20,5 +20,18 @@
     <TypeScriptSourceRoot />
   </PropertyGroup>
 
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="http://json-schema.org/draft-04/schema" /></VisualStudio></ProjectExtensions>
+
+  <ItemGroup>
+    <PackageReference Include="Exceptionless.AspNetCore" Version="4.3.2027" />
+    <PackageReference Include="Huanent.Logging.File" Version="2.1.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AS.OCR.Commom\AS.OCR.Commom.csproj" />
+    <ProjectReference Include="..\AS.OCR.Model\AS.OCR.Model.csproj" />
+  </ItemGroup>
+
 
 </Project>

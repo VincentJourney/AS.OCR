@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AS.OCR.Api.Middleware;
+using AS.OCR.Commom.Util;
+using Exceptionless;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -35,6 +38,11 @@ namespace AS.OCR.Api
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseMiddleware(typeof(CustomExceptionHandlerMiddleware));//È«¾ÖÒì³£
+
+            ExceptionlessClient.Default.Configuration.ApiKey = ConfigurationUtil.Exceptionless_ApiKey;
+            ExceptionlessClient.Default.Configuration.ServerUrl = ConfigurationUtil.Exceptionless_ServerUrl;
+            app.UseExceptionless();
 
             app.UseHttpsRedirection();
 

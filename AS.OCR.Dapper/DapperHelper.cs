@@ -1,4 +1,4 @@
-﻿using AS.OCR.Commom;
+﻿using AS.OCR.Commom.Util;
 using System;
 using System.Data;
 using System.Data.SqlClient;
