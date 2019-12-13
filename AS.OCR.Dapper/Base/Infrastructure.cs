@@ -84,7 +84,7 @@ namespace AS.OCR.Dapper.Base
         /// <typeparam name="T"></typeparam>
         /// <param name="whereStr"></param>
         /// <returns></returns>
-        public S GetModelFromSql<S>(string sql) where S : class => DbContext.QueryFirstOrDefault<S>(sql);
+        public S GetModelFromSql<S>(string sql) => DbContext.QueryFirstOrDefault<S>(sql);
 
         /// <summary>
         /// 可通过业务实体
@@ -92,7 +92,7 @@ namespace AS.OCR.Dapper.Base
         /// <typeparam name="T"></typeparam>
         /// <param name="whereStr"></param>
         /// <returns></returns>
-        public List<S> GetListFromSql<S>(string sql) where S : class => DbContext.Query<S>(sql).ToList();
+        public List<S> GetListFromSql<S>(string sql) => DbContext.Query<S>(sql).ToList();
 
     }
 }

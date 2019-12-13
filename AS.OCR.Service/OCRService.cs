@@ -25,6 +25,10 @@ namespace AS.OCR.Service
         private static readonly object cacheLocker = new object();
 
         private static StoreDAO storeDAO = new StoreDAO();
+        private static ApplyPictureRecongnizeDAO applyPictureRecongnizeDAO = new ApplyPictureRecongnizeDAO();
+        private static ApplyPointDAO applyPointDAO = new ApplyPointDAO();
+        private static CardDAO cardDAO = new CardDAO();
+
         /// <summary>
         /// 图片识别
         /// </summary>
@@ -61,7 +65,7 @@ namespace AS.OCR.Service
                     text = s.text
                 }).ToList();
             //查询所有的商铺规则并缓存
-            List<StoreOCRDetail> AllStoreOCRDetailRuleList = CacheHandle<List<StoreOCRDetail>>(
+            List<StoreOCRDetail> AllStoreOCRDetailRuleList = CacheHandle<StoreOCRDetail, List<StoreOCRDetail>>(
                 Key: "AllStoreOCRDetailRuleList"
                 , Hour: ConfigurationUtil.CacheExpiration_StoreOCRDetailRuleList
                 , sqlWhere: "");
@@ -97,7 +101,6 @@ namespace AS.OCR.Service
                     if (word.text.Contains(key))//只需要小票包含关键字
                     {
                         //根据小票关键字找到规则所在的StoreId，加上前端传来的mallid
-                        //var recognitionModel = storeDAO.GetById(Detail.StoreId.ToString(), mallId);
                         var recognitionModel = storeDAO.Get(Detail.StoreId);
                         if (recognitionModel != null)
                             recognitionList.Add(recognitionModel);
@@ -105,8 +108,8 @@ namespace AS.OCR.Service
                 }
             }
 
-            List<Mall> MallList = CacheHandle<List<Mall>>(Key: "AllMall",
-                                                          Hour: int.Parse(ConfigurationUtil.GetSection("ObjectConfig:CacheExpiration:AllMall")),
+            List<Mall> MallList = CacheHandle<Mall, List<Mall>>(Key: "AllMall",
+                                                          Hour: ConfigurationUtil.CacheExpiration_Mall,
                                                           sqlWhere: "");
             Store StoreModel = null;
             if (recognitionList != null && recognitionList.Count() > 0)
@@ -118,7 +121,7 @@ namespace AS.OCR.Service
                     {
                         foreach (var word in WordList)
                         {
-                            if (word.words.Contains(mallnamekey.ToLower()))//只需要小票包含关键字
+                            if (word.text.Contains(mallnamekey.ToLower()))//只需要小票包含关键字
                             {
                                 StoreModel = item;
                                 Mall thismall = MallList.Where(s => s.MallID == item.MallID).FirstOrDefault();
@@ -226,9 +229,9 @@ namespace AS.OCR.Service
                 OCRResult = JsonConvert.SerializeObject(ReceiptOCRModel),
                 AddedTime = DateTime.Now
             };
-            var AddResult = DbContext.Add(RecongnizeModel);//添加原始数据 applyid 等待积分申请
-                                                           //添加成功后 出参RecongnizeModelId
-            if (AddResult == 0)
+            var AddResult = applyPictureRecongnizeDAO.Add(RecongnizeModel);//添加原始数据 applyid 等待积分申请
+                                                                           //添加成功后 出参RecongnizeModelId
+            if (AddResult)
                 ReceiptOCRModel.RecongnizelId = RecongnizeModelId;
             else
                 TError("添加到ApplyPictureRecongnize失败");
@@ -238,31 +241,31 @@ namespace AS.OCR.Service
 
 
             //根据规则获取指定识别内容
-            Result GetValue(List<Words> words_result, int index, StoreOCRDetail StoreDetailRule)
+            Result GetValue(List<Word> words_result, int index, StoreOCRDetail StoreDetailRule)
             {
                 var WordValue = "";
                 var Key = StoreDetailRule.OCRKey.Trim().Replace("：", "").Replace(":", "").ToLower().Split(',');
                 if (Key.Length < 2)
                 {
-                    var newWord = words_result[index].words.Replace("：", "").Replace(":", "");
+                    var newWord = words_result[index].text.Replace("：", "").Replace(":", "");
                     if (!newWord.Contains(Key[0]))
                         return new Result(false, "", WordValue);
                 }
                 else
                 {
-                    if (!words_result[index].words.Contains(Key[0]) || !words_result[index].words.Contains(Key[1]))
+                    if (!words_result[index].text.Contains(Key[0]) || !words_result[index].text.Contains(Key[1]))
                         return new Result(false, "", WordValue);
                 }
 
                 switch (StoreDetailRule.GetValueWay)//可查看枚举注释
                 {
                     case (int)GetValueWay.OCRKey://在关键字中 用下标取值
-                        WordValue = GetValueByIndexArr(words_result[index].words, StoreDetailRule.SkipLines);
+                        WordValue = GetValueByIndexArr(words_result[index].text, StoreDetailRule.SkipLines);
                         break;
 
                     case (int)GetValueWay.AfterOCRKey://关键字后 根据下标取值
-                        int IndexOfKey = words_result[index].words.IndexOf(StoreDetailRule.OCRKey) + StoreDetailRule.OCRKey.Length;
-                        string AfterKey = words_result[index].words.Substring(IndexOfKey);//关键字之后的文字
+                        int IndexOfKey = words_result[index].text.IndexOf(StoreDetailRule.OCRKey) + StoreDetailRule.OCRKey.Length;
+                        string AfterKey = words_result[index].text.Substring(IndexOfKey);//关键字之后的文字
                         WordValue = GetValueByIndexArr(AfterKey, StoreDetailRule.SkipLines);
                         break;
 
@@ -271,20 +274,20 @@ namespace AS.OCR.Service
                         {
                             NextLine = index + int.Parse(StoreDetailRule.SkipLines);
                             if (NextLine <= words_result.Count())
-                                WordValue = words_result[NextLine].words;
+                                WordValue = words_result[NextLine].text;
                         }
                         break;
 
                     case (int)GetValueWay.BeforeOCRKey://关键字前 根据下标取值
-                        int IndexOfKey2 = words_result[index].words.IndexOf(StoreDetailRule.OCRKey);
-                        string BeforeKey = words_result[index].words.Substring(0, IndexOfKey2);//关键字之前的文字
+                        int IndexOfKey2 = words_result[index].text.IndexOf(StoreDetailRule.OCRKey);
+                        string BeforeKey = words_result[index].text.Substring(0, IndexOfKey2);//关键字之前的文字
                         WordValue = GetValueByIndexArr(BeforeKey, StoreDetailRule.SkipLines);
                         break;
 
                     case (int)GetValueWay.BetweenOCRKey://关键字之间 并用下标取值
                         var KetArr = StoreDetailRule.OCRKey.Split(',');
-                        int afterkeyIndex = words_result[index].words.IndexOf(KetArr[0]) + KetArr[0].Length;
-                        string AfterKeyWord = words_result[index].words.Substring(afterkeyIndex);//关键字之后
+                        int afterkeyIndex = words_result[index].text.IndexOf(KetArr[0]) + KetArr[0].Length;
+                        string AfterKeyWord = words_result[index].text.Substring(afterkeyIndex);//关键字之后
                         int beforekeyIndex = AfterKeyWord.IndexOf(KetArr[1]);
                         string BeforeKeyWord = AfterKeyWord.Substring(0, beforekeyIndex);//关键字之前
                         WordValue = GetValueByIndexArr(BeforeKeyWord, StoreDetailRule.SkipLines);
@@ -322,7 +325,7 @@ namespace AS.OCR.Service
         private static Result VerifyRecognition(ReceiptOCR receiptOCR)
         {
             //识别的原始数据
-            var RecongnizeModel = dal.GetModel<ApplyPictureRecongnize>($" and id ='{receiptOCR.RecongnizelId}'");
+            var RecongnizeModel = applyPictureRecongnizeDAO.Get(receiptOCR.RecongnizelId);
             if (RecongnizeModel == null)
                 return new Result(false, "校验失败：识别数据丢失，请重新识别小票！", null);
 
@@ -340,16 +343,16 @@ namespace AS.OCR.Service
                 string.IsNullOrWhiteSpace(receiptOCR.StoreCode) ||
                 string.IsNullOrWhiteSpace(receiptOCR.MallName) ||
                 receiptOCR.TranAmount == 0 ||
-                receiptOCR.TransDatetime == Commom.DefaultDateTime || receiptOCR.TransDatetime == null)
+                receiptOCR.TransDatetime == DefaultDateTime || receiptOCR.TransDatetime == null)
             {
                 return new Result(false, "校验失败：小票未识别完整！", null);
             }
             #endregion
 
             #region 匹配商铺规则
-            StoreOCR StoreOCRRule = CacheHandle<StoreOCR>(
+            StoreOCR StoreOCRRule = CacheHandle<StoreOCR, StoreOCR>(
                Key: $"StoreOCR{receiptOCR.StoreId}",
-               Hour: double.Parse(ConfigurationUtil.GetSection("ObjectConfig:CacheExpiration:StoreOCR")),
+               Hour: ConfigurationUtil.CacheExpiration_StoreOCR,
                sqlWhere: $"and StoreId = '{receiptOCR.StoreId}'");
 
             if (StoreOCRRule == null)
@@ -365,16 +368,14 @@ namespace AS.OCR.Service
 
                 if (StoreOCRRule.MaxTicketPerDay != 0)  //日自动交易笔数为0时 代表不限制
                 {
-                    var TicketPerDay = DbContext.Query<int>($@"select count(*) from ApplyPoint
-                               where StoreID = '{receiptOCR.StoreId}' and VerifyStatus = 1 
-                               and SourceType=7 and DATEDIFF(dd,AuditDate,GETDATE())=0").FirstOrDefault(); //当日交易笔数
+                    var TicketPerDay = applyPointDAO.GetApplyPointCountByDay(receiptOCR.StoreId); //当日交易笔数
                     if (TicketPerDay >= StoreOCRRule.MaxTicketPerDay)
                         return new Result(false, "校验失败：今日已超过最大自动积分记录数量");
                 }
 
-                Store StoreModel = CacheHandle<Store>(
+                Store StoreModel = CacheHandle<Store, Store>(
                     Key: $"Store{receiptOCR.StoreId}",
-                    Hour: double.Parse(ConfigurationUtil.GetSection("ObjectConfig:CacheExpiration:Store")),
+                    Hour: ConfigurationUtil.CacheExpiration_Store,
                     sqlWhere: $" and StoreId = '{receiptOCR.StoreId}'");
 
                 if ((StoreModel.IsStandardPOS == "1" ? 0 : 1) != StoreOCRRule.POSType)
@@ -396,9 +397,9 @@ namespace AS.OCR.Service
         public static Result CreateApplyPoint(ApplyPointRequest applyPointRequest)
         {
             //所有广场
-            List<Mall> MallList = CacheHandle<List<Mall>>(
+            List<Mall> MallList = CacheHandle<Mall, List<Mall>>(
                 Key: "AllMall",
-                Hour: int.Parse(ConfigurationUtil.GetSection("ObjectConfig:CacheExpiration:AllMall")),
+                Hour: ConfigurationUtil.CacheExpiration_Mall,
                 sqlWhere: "");
 
             Guid OrgID = Guid.Empty;
@@ -407,14 +408,14 @@ namespace AS.OCR.Service
             else
                 TError("积分申请 【mallId】参数错误");
 
-            Store StoreModel = CacheHandle<Store>(
+            Store StoreModel = CacheHandle<Store, Store>(
                 Key: $"Store{applyPointRequest.receiptOCR.StoreId}",
-                Hour: double.Parse(ConfigurationUtil.GetSection("ObjectConfig:CacheExpiration:Store")),
+                Hour: ConfigurationUtil.CacheExpiration_Store,
                 sqlWhere: $" and StoreId = '{applyPointRequest.receiptOCR.StoreId}'");
 
-            StoreOCR StoreOCRRule = CacheHandle<StoreOCR>(
+            StoreOCR StoreOCRRule = CacheHandle<StoreOCR, StoreOCR>(
                 Key: $"StoreOCR{applyPointRequest.receiptOCR.StoreId}",
-                Hour: double.Parse(ConfigurationUtil.GetSection("ObjectConfig:CacheExpiration:StoreOCR")),
+                Hour: ConfigurationUtil.CacheExpiration_StoreOCR,
                 sqlWhere: $"and StoreId = '{applyPointRequest.receiptOCR.StoreId}'");
 
             //增加原始小票
@@ -425,11 +426,11 @@ namespace AS.OCR.Service
 
             ApplyPoint ApplyPoint = null;
             if (!string.IsNullOrWhiteSpace(applyPointRequest.receiptOCR.ReceiptNo) && applyPointRequest.receiptOCR.StoreId != Guid.Empty)
-                ApplyPoint = dal.GetModel<ApplyPoint>($@" and ReceiptNo='{applyPointRequest.receiptOCR.ReceiptNo}' 
+                ApplyPoint = applyPointDAO.GetModel($@" and ReceiptNo='{applyPointRequest.receiptOCR.ReceiptNo}' 
                                                           and StoreID='{applyPointRequest.receiptOCR.StoreId}'
                                                           and TransDate='{applyPointRequest.receiptOCR.TransDatetime}'");
 
-            ApplyPictureRecongnize applyPictureRecongnize = dal.GetModel<ApplyPictureRecongnize>($" and id='{applyPointRequest.receiptOCR.RecongnizelId}'");
+            ApplyPictureRecongnize applyPictureRecongnize = applyPictureRecongnizeDAO.Get(applyPointRequest.receiptOCR.RecongnizelId);
 
             if (applyPictureRecongnize == null)
                 TError("can't find ApplyPictureRecongnize");
@@ -454,7 +455,7 @@ namespace AS.OCR.Service
             };
 
             applyPictureRecongnize.applyid = ApplyPointId;
-            DbContext.Update(applyPictureRecongnize);
+            applyPictureRecongnizeDAO.Update(applyPictureRecongnize);
 
             var VerifyRecognitionResult = VerifyRecognition(applyPointRequest.receiptOCR);//校验结果
             ApplyPoint.AuditDate = DateTime.Now;
@@ -463,21 +464,21 @@ namespace AS.OCR.Service
                 ApplyPoint.RecongizeStatus = 3;
                 ApplyPoint.VerifyStatus = 0;
                 ApplyPoint.Status = 0;
-                DbContext.Add(ApplyPoint);
+                applyPointDAO.Add(ApplyPoint);
                 return VerifyRecognitionResult;
             }
 
             ApplyPoint.RecongizeStatus = 2;
             ApplyPoint.VerifyStatus = 1;
-            DbContext.Add<ApplyPoint>(ApplyPoint);
+            applyPointDAO.Add(ApplyPoint);
 
-            List<Company> companyList = CacheHandle<List<Company>>(
+            List<Company> companyList = CacheHandle<Company, List<Company>>(
                 Key: "Company",
-                Hour: double.Parse(ConfigurationUtil.GetSection("ObjectConfig:CacheExpiration:Company")),
+                Hour: ConfigurationUtil.CacheExpiration_Company,
                 sqlWhere: "");
-            List<OrgInfo> orgList = CacheHandle<List<OrgInfo>>(
+            List<OrgInfo> orgList = CacheHandle<OrgInfo, List<OrgInfo>>(
                 Key: "OrgInfo",
-                Hour: double.Parse(ConfigurationUtil.GetSection("ObjectConfig:CacheExpiration:OrgInfo")),
+                Hour: ConfigurationUtil.CacheExpiration_OrgInfo,
                 sqlWhere: "");
 
 
@@ -487,7 +488,7 @@ namespace AS.OCR.Service
             {
                 companyID = companyList.Where(s => s.CompanyId == (StoreModel?.CompanyID ?? Guid.Empty)).FirstOrDefault()?.CompanyCode ?? "",
                 storeID = StoreCode,
-                cardID = dal.GetModel<Card>($" and CardID='{applyPointRequest.cardId}'")?.CardCode ?? "",
+                cardID = cardDAO.Get(Guid.Parse(applyPointRequest.cardId))?.CardCode ?? "",
                 cashierID = "CrmAIApplyPoint",
                 discountPercentage = 0,
                 orgID = MallList.Where(s => s.MallID == (StoreModel?.MallID ?? Guid.Empty)).FirstOrDefault()?.MallCode ?? "",
@@ -500,12 +501,12 @@ namespace AS.OCR.Service
             if (!result.Success)
             {
                 ApplyPoint.Status = 2;
-                DbContext.Update<ApplyPoint>(ApplyPoint);
+                applyPointDAO.Update(ApplyPoint);
                 return new Result(true, "提交积分申请成功，积分失败！", null);
             }
 
             ApplyPoint.Status = 1;
-            DbContext.Update<ApplyPoint>(ApplyPoint);
+            applyPointDAO.Update(ApplyPoint);
 
             return new Result(true, "积分申请成功！", null);
         }
@@ -520,16 +521,9 @@ namespace AS.OCR.Service
 
             if (!Guid.TryParse(applyPointHistoryRequest.cardId, out var CardId))
                 TError("参数错误！");
-            List<ApplyPointModel> applyPointList = dal.GetApplyPointHistory(CardId);
+            List<ApplyPointModel> applyPointList = applyPointDAO.GetApplyPointHistory(CardId);
             return new Result(true, "", applyPointList);
         }
-
-
-
-
-
-
-
 
         /// <summary>
         /// 自动积分并微信推送接口
@@ -538,8 +532,6 @@ namespace AS.OCR.Service
         /// <returns></returns>
         public async static Task<Result> WebPosForPoint(WebPosArg webPosArg)
         {
-            Log.Warn($@"WebPosForPoint 參數:
-                      {JsonConvert.SerializeObject(webPosArg)}", null);
             //int amount = new Random(((unchecked((int)DateTime.Now.Millisecond + (int)DateTime.Now.Ticks)))).Next(10, 2000);
             string testString = $@"<cmd type=""SALES"" appCode=""POS"">
                                         <shared offline=""true"">
@@ -561,15 +553,14 @@ namespace AS.OCR.Service
             try
             {
                 WebPos.WebPOSSoapClient ws = new WebPos.WebPOSSoapClient(WebPos.WebPOSSoapClient.EndpointConfiguration.WebPOSSoap);
-                Log.Warn($@"ws address:{ws.Endpoint.Address.Uri.AbsoluteUri}", null);
+                //Log.Warn($@"ws address:{ws.Endpoint.Address.Uri.AbsoluteUri}", null);
                 WebPos.WebPOSCredentials mwc = new WebPos.WebPOSCredentials();
 
 
-                mwc.Username = ConfigurationUtil.GetSection("ObjectConfig:WebPosService:UserName");
-                var password = ConfigurationUtil.GetSection("ObjectConfig:WebPosService:PassWord");
+                mwc.Username = ConfigurationUtil.WebPosUserName;
+                var password = ConfigurationUtil.WebPosPassWord;
                 mwc.Password = ws.GetEncryptedCharAsync(password).Result;
                 cmdResult = await ws.CmdAsync(mwc, testString);
-                Log.Warn($@"cmdResult :{cmdResult}", null);
             }
             catch (Exception ex)
             {
@@ -600,19 +591,19 @@ namespace AS.OCR.Service
                 TError("参数错误");
 
             #region 缓存取公共信息
-            Store StoreModel = CacheHandle<Store>(
+            Store StoreModel = CacheHandle<Store, Store>(
               Key: $"Store{d["storecode"]}",
-              Hour: double.Parse(ConfigurationUtil.GetSection("ObjectConfig:CacheExpiration:Store")),
+              Hour: ConfigurationUtil.CacheExpiration_Store,
               sqlWhere: $" and StoreCode = '{d["storecode"]}'");
 
-            List<Company> companyList = CacheHandle<List<Company>>(
+            List<Company> companyList = CacheHandle<Company, List<Company>>(
                    Key: "Company",
-                   Hour: double.Parse(ConfigurationUtil.GetSection("ObjectConfig:CacheExpiration:Company")),
+                   Hour: ConfigurationUtil.CacheExpiration_Company,
                    sqlWhere: "");
             #endregion
 
             var receiptNo = string.Empty;
-            DateTime txnDateTime = Commom.DefaultDateTime;
+            DateTime txnDateTime = DefaultDateTime;
             var cashierID = string.Empty;
             decimal amount = 0M;
             var orgid = string.Empty;
@@ -638,7 +629,7 @@ namespace AS.OCR.Service
             {
                 companyID = companyList.Where(s => s.CompanyId == StoreModel.CompanyID).FirstOrDefault()?.CompanyCode ?? "",
                 storeID = storecode,
-                cardID = dal.GetModel<Card>($" and CardID='{arg.cardId}'")?.CardCode ?? "",
+                cardID = cardDAO.Get(Guid.Parse(arg.cardId))?.CardCode ?? "",
                 cashierID = cashierID,
                 discountPercentage = 0,
                 orgID = orgid,

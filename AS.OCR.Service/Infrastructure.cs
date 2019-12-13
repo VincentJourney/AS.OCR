@@ -21,50 +21,37 @@ namespace AS.OCR.Service
         private static readonly object cacheLocker = new object();
 
 
+        public static DateTime DefaultDateTime = DateTime.Parse("1900-01-01");
 
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="S">返回参数类型</typeparam>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="Tretrun"></typeparam>
         /// <param name="Key"></param>
         /// <param name="Hour"></param>
         /// <param name="sqlWhere"></param>
         /// <returns></returns>
-        public T CacheHandle<T>(string Key, double Hour, string sqlWhere) where T : AbstractEntity
+        public static Tretrun CacheHandle<T, Tretrun>(string Key, double Hour, string sqlWhere) where T : AbstractEntity
+                                                                                         where Tretrun : class
         {
-            T Value = default;
+            Tretrun Value = default;
             if (cacheHelper.Exists(Key))
-                Value = cacheHelper.Get<T>(Key) as T;
+                Value = cacheHelper.Get<T>(Key) as Tretrun;
             else
             {
-                if (typeof(T).IsGenericType) //如果T是泛型
+                lock (cacheLocker)//避免缓存并发
                 {
-                    lock (cacheLocker)//避免缓存并发
+                    if (!cacheHelper.Exists(Key))
                     {
-                        if (!cacheHelper.Exists(Key))
-                        //Value = baseDao.GetList(sqlWhere) as S;
-                        {
-                            //var baseDao = AS.OCR.Dapper.Base.Infrastructure < typeof(  typeof(T).GetType().GenericTypeArguments.FirstOrDefault())> ();
-                        }
-                        //Value = dal
-                        //    .GetType()
-                        //    .GetMethod("GetList")
-                        //    .MakeGenericMethod(new Type[]
-                        //    {
-                        //        typeof(T).GenericTypeArguments.FirstOrDefault() //LIST<T> 中T type
-                        //    })
-                        //    .Invoke(dal, new object[] { sqlWhere }) as T;
+                        AS.OCR.Dapper.Base.Infrastructure<T> infrastructure = new Dapper.Base.Infrastructure<T>();
+                        if (typeof(Tretrun).IsGenericType)
+                            Value = infrastructure.GetList(sqlWhere) as Tretrun;
+                        else
+                            Value = infrastructure.GetModel(sqlWhere) as Tretrun;
                     }
                 }
-                else
-                {
-                    lock (cacheLocker)
-                    {
-                        if (!cacheHelper.Exists(Key))
-                        { }
-                        //Value = baseDao.GetModel(sqlWhere) as S;
-                    }
-                }
+
                 if (Hour != 0) //有效时长设置为0时 不设置缓存
                 {
                     if (Value != null)

@@ -41,8 +41,8 @@ namespace AS.OCR.Commom.Util
 
         //public static string CacheExpiration => GetConfig("CacheExpiration:AllMallOCRRule");
         public static double CacheExpiration_StoreOCRDetailRuleList => GetConfig<double>("CacheExpiration:AllStoreOCRDetailRuleList");
-        //public static string RabbitMqPassword => GetConfig("CacheExpiration:StoreOCR");
-        //public static string RabbitMqPassword => GetConfig("CacheExpiration:Store");
+        public static double CacheExpiration_StoreOCR => GetConfig<double>("CacheExpiration:StoreOCR");
+        public static double CacheExpiration_Store => GetConfig<double>("CacheExpiration:Store");
         public static double CacheExpiration_Company => GetConfig<double>("CacheExpiration:Company");
         public static double CacheExpiration_OrgInfo => GetConfig<double>("CacheExpiration:OrgInfo");
         public static double CacheExpiration_Mall => GetConfig<double>("CacheExpiration:Mall");

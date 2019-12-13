@@ -55,13 +55,13 @@ namespace AS.OCR.Dapper.Base
         /// <typeparam name="S">返回类型</typeparam>
         /// <param name="sql"></param>
         /// <returns></returns>
-        S GetModelFromSql<S>(string sql) where S : class;
+        S GetModelFromSql<S>(string sql);
         /// <summary>
         /// 通过sql获取业务实体列表
         /// </summary>
         /// <typeparam name="S">返回类型</typeparam>
         /// <param name="sql"></param>
         /// <returns></returns>
-        List<S> GetListFromSql<S>(string sql) where S : class;
+        List<S> GetListFromSql<S>(string sql);
     }
 }
