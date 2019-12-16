@@ -4,20 +4,23 @@ using AS.OCR.Extension.SDK.TencentOCR;
 using AS.OCR.Model.Business;
 using AS.OCR.Model.Request;
 using AS.OCR.Model.Response;
+using AS.OCR.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace BaiDuOCR.Controllers
+namespace AS.OCR.Api.Controllers
 {
     [Produces("application/json")]
     [Route("api/ImageOCR")]
     public class OCRController : ControllerBase
     {
         private ILogger _logger { get; set; }
+        private OCRService oCRService;
         public OCRController(ILoggerFactory loggerFactory)
         {
             _logger = loggerFactory.CreateLogger(typeof(OCRController));
+            oCRService = new OCRService(loggerFactory);
         }
 
         /// <summary>
@@ -30,7 +33,7 @@ namespace BaiDuOCR.Controllers
         {
             if (oCRRequest == null)
                 throw new Exception("参数错误");
-            return await OCRVerify.ReceiptOCR(oCRRequest);
+            return await oCRService.ReceiptOCR(oCRRequest);
         }
 
         /// <summary>
@@ -46,7 +49,7 @@ namespace BaiDuOCR.Controllers
                  string.IsNullOrWhiteSpace(applyPointRequest.mallId) ||
                 applyPointRequest.receiptOCR == null)
                 throw new Exception("参数错误");
-            return OCRVerify.CreateApplyPoint(applyPointRequest);
+            return oCRService.CreateApplyPoint(applyPointRequest);
         }
 
         /// <summary>
@@ -59,7 +62,7 @@ namespace BaiDuOCR.Controllers
         {
             if (applyPointHistoryRequest == null)
                 throw new Exception("参数错误");
-            return OCRVerify.GetApplePointByCardId(applyPointHistoryRequest);
+            return oCRService.GetApplePointByCardId(applyPointHistoryRequest);
         }
 
         /// <summary>
@@ -69,35 +72,32 @@ namespace BaiDuOCR.Controllers
         /// <returns></returns>
         [HttpPost("ImageUpLoad")]
         public Result ImageUpLoad([FromBody]string Base64) =>
-            OCRVerify.ImageUpload(Base64);
+            oCRService.ImageUpload(Base64);
 
         /// <summary>
         /// 测试腾讯云OCR
         /// </summary>
-        /// <param name="ImageUrl"></param>
-        /// <param name="Type"></param>
+        /// <param name="tencentCloudOCRRequest"></param>
         /// <returns></returns>
         [HttpPost("TencentCloudOCR")]
         public TencentOCRResult TencentCloudOCR([FromBody]TencentCloudOCRRequest tencentCloudOCRRequest)
         {
             if (tencentCloudOCRRequest == null)
-            {
                 throw new Exception("参数错误");
-            }
             return TencentOCR.GeneralAccurateOCR(tencentCloudOCRRequest.Image, tencentCloudOCRRequest.Type);
         }
 
         /// <summary>
         /// 自动积分并微信推送接口
         /// </summary>
-        /// <param name="webPosArg"></param>
+        /// <param name="req"></param>
         /// <returns></returns>
         [HttpPost("WebPosForPoint")]
         public async Task<Result> WebPosForPoint([FromBody]WebPosRequest req)
         {
             if (req == null || string.IsNullOrWhiteSpace(req.arg) || string.IsNullOrWhiteSpace(req.cardId))
                 throw new Exception("参数错误");
-            return await OCRVerify.CommitApplyPoint(req);
+            return await oCRService.CommitApplyPoint(req);
         }
     }
 }

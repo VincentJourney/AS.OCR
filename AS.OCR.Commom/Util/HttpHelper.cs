@@ -60,5 +60,24 @@ namespace AS.OCR.Commom.Util
             }
             return result;
         }
+
+        public static string HttpGet(string url)
+        {
+            string result = "";
+            HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
+            HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
+            Stream stream = resp.GetResponseStream();
+            try
+            {
+                //获取内容 
+                using (StreamReader reader = new StreamReader(stream))
+                    result = reader.ReadToEnd();
+            }
+            finally
+            {
+                stream.Close();
+            }
+            return result;
+        }
     }
 }

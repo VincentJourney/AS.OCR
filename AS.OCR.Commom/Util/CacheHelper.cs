@@ -199,5 +199,17 @@ namespace AS.OCR.Commom.Util
             }
             return keys;
         }
+
+        public T GetValueByCache<T>(string Key, T Value, TimeSpan timeSpan) where T : class
+        {
+            if (this.Exists(Key))
+                Value = this.Get<T>(Key);
+            else
+            {
+                if (Value != null)
+                    this.Set(Key, Value, timeSpan);
+            }
+            return Value;
+        }
     }
 }
