@@ -6,7 +6,7 @@ namespace AS.OCR.Commom.Util
 {
     public static class ConfigurationUtil
     {
-        static IConfigurationRoot configuration;
+        static IConfiguration configuration;
         static ConfigurationUtil()
         {
             configuration = new ConfigurationBuilder()
@@ -18,7 +18,7 @@ namespace AS.OCR.Commom.Util
         {
             try
             {
-                return (T)(configuration.GetSection(key).Value as object);
+                return configuration.GetValue<T>(key);
             }
             catch (Exception ex)
             {
@@ -29,7 +29,8 @@ namespace AS.OCR.Commom.Util
         /// <summary>
         /// 数据库连接
         /// </summary>
-        public static string ConnectionStringSqlServer => GetConfig<string>("ConnectionString");
+        public static string CMR_ConnectionString => GetConfig<string>("CMR_ConnectionString");
+        public static string OCR_ConnectionString => GetConfig<string>("OCR_ConnectionString");
 
         #region 腾讯OCR服务
         public static string TencentSecretId => GetConfig<string>("TencentConfig:SecretId");
@@ -70,31 +71,31 @@ namespace AS.OCR.Commom.Util
         #endregion
 
         #region Redis配置项
-        public static string RedisAddress => GetConfig<string>("ObjectConfig:Redis:RedisAddress");
-        public static string RedisKey => GetConfig<string>("ObjectConfig:Redis:RedisKey");
+        public static string RedisAddress => GetConfig<string>("Redis:RedisAddress");
+        public static string RedisKey => GetConfig<string>("Redis:RedisKey");
         #endregion
 
         #region 企业微信配置项
-        public static string EnterpriseWeChat_AppID => GetConfig<string>("ObjectConfig:EnterpriseWeChat:AppID");
-        public static string EnterpriseWeChat_AppSecret => GetConfig<string>("ObjectConfig:EnterpriseWeChat:AppSecret");
-        public static string EnterpriseWeChat_Touser => GetConfig<string>("ObjectConfig:EnterpriseWeChat:Touser");
-        public static int EnterpriseWeChat_AgentId => GetConfig<int>("ObjectConfig:EnterpriseWeChat:AgentId");
+        public static string EnterpriseWeChat_AppID => GetConfig<string>("EnterpriseWeChat:AppID");
+        public static string EnterpriseWeChat_AppSecret => GetConfig<string>("EnterpriseWeChat:AppSecret");
+        public static string EnterpriseWeChat_Touser => GetConfig<string>("EnterpriseWeChat:Touser");
+        public static int EnterpriseWeChat_AgentId => GetConfig<int>("EnterpriseWeChat:AgentId");
         #endregion
 
-        public static string TencentOCR_KingKey_HashId => GetConfig<string>("ObjectConfig:TencentOCR_KingKey:HashId");
-        public static string TencentOCR_KingKey_RedisKey => GetConfig<string>("ObjectConfig:TencentOCR_KingKey:RedisKey");
+        public static string TencentOCR_KingKey_HashId => GetConfig<string>("TencentOCR_KingKey:HashId");
+        public static string TencentOCR_KingKey_RedisKey => GetConfig<string>("TencentOCR_KingKey:RedisKey");
         /// <summary>
         /// 京基购买总次数
         /// </summary>
-        public static int TencentOCR_KingKey_Total => GetConfig<int>("ObjectConfig:TencentOCR_KingKey:Total");
+        public static int TencentOCR_KingKey_Total => GetConfig<int>("TencentOCR_KingKey:Total");
         /// <summary>
         /// 京基剩余N次数警告
         /// </summary>
-        public static int TencentOCR_KingKey_Warning => GetConfig<int>("ObjectConfig:TencentOCR_KingKey:Warning");
+        public static int TencentOCR_KingKey_Warning => GetConfig<int>("TencentOCR_KingKey:Warning");
         /// <summary>
         /// 京基警告评率（警告线下N次提醒一次）
         /// </summary>
-        public static int TencentOCR_KingKey_WarningHz => GetConfig<int>("ObjectConfig:TencentOCR_KingKey:WarningHz");
+        public static int TencentOCR_KingKey_WarningHz => GetConfig<int>("TencentOCR_KingKey:WarningHz");
 
 
 

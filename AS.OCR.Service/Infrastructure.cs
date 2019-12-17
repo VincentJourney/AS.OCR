@@ -43,7 +43,7 @@ namespace AS.OCR.Service
                 {
                     if (!cacheHelper.Exists(Key))
                     {
-                        AS.OCR.Dapper.Base.Infrastructure<T> infrastructure = new Dapper.Base.Infrastructure<T>();
+                        AS.OCR.Dapper.Base.CrmInfrastructure<T> infrastructure = new Dapper.Base.CrmInfrastructure<T>();
                         if (typeof(Tretrun).IsGenericType)
                             Value = infrastructure.GetList(sqlWhere) as Tretrun;
                         else

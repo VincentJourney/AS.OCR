@@ -1,0 +1,54 @@
+﻿@{
+    Layout = "~/Views/Layout_Script.cshtml";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+
+    <table id="info">
+    </table>
+
+</body>
+</html>
+<script>
+    $(function () {
+        $('#info').bootstrapTable({
+            //url: '/json/data.json',        // 表格数据来源
+            columns: [{
+                field: 'Id',
+                title: 'Id'
+            }, {
+                field: 'Name',
+                title: '项目名称'
+            }, {
+                field: 'Total',
+                title: '购买次数'
+            }, {
+                field: 'Free',
+                title: '免费次数'
+            }, {
+                field: 'Warning',
+                title: '预警提示次数'
+            }, {
+                field: 'WarningHz',
+                title: '预警频率'
+            }, {
+                field: 'Used',
+                title: '已使用次数'
+            }, {
+                field: 'Balance',
+                title: '剩余次数'
+            }, {
+                field: 'RedisKey',
+                title: 'RedisKey'
+            }, {
+                field: 'HashId',
+                title: 'HashId'
+            }]
+        });
+    });
+</script>

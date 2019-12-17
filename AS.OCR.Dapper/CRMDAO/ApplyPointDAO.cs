@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace AS.OCR.Dapper.DAO
 {
-    public class ApplyPointDAO : Infrastructure<ApplyPoint>
+    public class ApplyPointDAO : CrmInfrastructure<ApplyPoint>
     {
         public List<ApplyPointModel> GetApplyPointHistory(Guid cardId)
         {

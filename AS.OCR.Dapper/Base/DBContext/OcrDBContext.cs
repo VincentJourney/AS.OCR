@@ -1,24 +1,20 @@
-﻿using Dapper;
+﻿using AS.OCR.Commom.Util;
+using AS.OCR.Dapper.Base.DapperHelper;
+using Dapper;
 using Dapper.Contrib.Extensions;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AS.OCR.Dapper
+namespace AS.OCR.Dapper.Base.DBContext
 {
-    public static class DbContext
+    public static class OcrDBContext
     {
+        private static readonly OcrDapperHelper helper = new OcrDapperHelper(ConfigurationUtil.OCR_ConnectionString);
         // 获取开启数据库的连接
-        public static IDbConnection Db
-        {
-            get
-            {
-                //创建单一实例
-                DapperHelper.GetInstance();
-                return DapperHelper.OpenCurrentDbConnection();
-            }
-        }
+        public static IDbConnection Db { get => helper.OpenCurrentDbConnection(); }
+
 
         /// <summary>
         /// 查出一条记录的实体
@@ -126,7 +122,7 @@ namespace AS.OCR.Dapper
         public static T GetModel<T>(string whereStr = "")
         {
             var sqlCondition = string.IsNullOrWhiteSpace(whereStr) ? "" : $" where {whereStr}";
-            return DbContext.Query<T>($@"SELECT * FROM {typeof(T).Name} {sqlCondition}").FirstOrDefault();
+            return CrmDBContext.Query<T>($@"SELECT * FROM {typeof(T).Name} {sqlCondition}").FirstOrDefault();
         }
 
 
@@ -139,9 +135,9 @@ namespace AS.OCR.Dapper
         public static List<T> GetList<T>(string whereStr = "")
         {
             var sqlCondition = string.IsNullOrWhiteSpace(whereStr) ? "" : $" where {whereStr}";
-            return DbContext.Query<T>($@"SELECT * FROM {typeof(T).Name} {sqlCondition}").ToList();
+            return CrmDBContext.Query<T>($@"SELECT * FROM {typeof(T).Name} {sqlCondition}").ToList();
         }
-           
+
     }
 }
 

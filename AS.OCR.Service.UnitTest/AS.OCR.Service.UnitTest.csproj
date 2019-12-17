@@ -13,4 +13,9 @@
     <PackageReference Include="coverlet.collector" Version="1.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AS.OCR.Model\AS.OCR.Model.csproj" />
+    <ProjectReference Include="..\AS.OCR.Service\AS.OCR.Service.csproj" />
+  </ItemGroup>
+
 </Project>

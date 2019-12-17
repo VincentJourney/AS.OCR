@@ -438,7 +438,7 @@ namespace AS.OCR.Service
             if (applyPictureRecongnize == null)
                 TError("can't find ApplyPictureRecongnize");
 
-            if (ApplyPoint != null) 
+            if (ApplyPoint != null)
                 TError("该小票已积分，不可重复提交");
 
             var ApplyPointId = Guid.NewGuid();
