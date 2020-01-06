@@ -8,7 +8,7 @@ using AS.OCR.Dapper.Base;
 
 namespace AS.OCR.Dapper.DAO
 {
-    public class CardDAO : CrmInfrastructure<Card>
+    public class CardDAO : Infrastructure<Card>
     {
 
     }

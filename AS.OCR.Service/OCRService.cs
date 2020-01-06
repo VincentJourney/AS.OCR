@@ -41,7 +41,7 @@ namespace AS.OCR.Service
         /// </summary>
         /// <param name="oCRRequest"></param>
         /// <returns>识别结果</returns>
-        public async Task<Result> ReceiptOCR(OCRRequest oCRRequest)
+        public async Task<Result<ReceiptOCR>> ReceiptOCR(OCRRequest oCRRequest)
         {
             var imageUrl = "";
             if (oCRRequest.Type == null || oCRRequest.Type == 1)
@@ -59,7 +59,7 @@ namespace AS.OCR.Service
         /// <param name="mallId"></param>
         /// <param name="ImageUrl"></param>
         /// <returns></returns>
-        private Result RecognitOCRResult(TencentOCRResult OcrResult, string mallId, string ImageUrl)
+        private Result<ReceiptOCR> RecognitOCRResult(TencentOCRResult OcrResult, string mallId, string ImageUrl)
         {
             if (string.IsNullOrWhiteSpace(mallId))
                 TError("请选择 Mall");
@@ -161,7 +161,7 @@ namespace AS.OCR.Service
 
             ReceiptOCRModel.RecongnizelId = RecongnizeModelId;
 
-            return new Result(true, "识别成功", ReceiptOCRModel);
+            return SuccessRes(ReceiptOCRModel, "识别成功");
 
             //匹配
             ReceiptOCR Matching(List<Word> WordList, ReceiptOCR ReceiptOCRModel, List<StoreOCRDetail> ThisStoreOCRDetail)
@@ -170,7 +170,7 @@ namespace AS.OCR.Service
                 {
                     foreach (var StoreDetailRule in ThisStoreOCRDetail)
                     {
-                        Result ReturnResult = GetValue(WordList, i, StoreDetailRule); //根据规则取值
+                        Result<string> ReturnResult = GetValue(WordList, i, StoreDetailRule); //根据规则取值
                         if (ReturnResult.Success)
                         {
                             var ReturnData = ReturnResult.Data.ToString();
@@ -210,6 +210,7 @@ namespace AS.OCR.Service
                                             catch (Exception ex)
                                             {
                                                 ReceiptOCRModel.TransDatetime = null;
+                                                logger.LogError(eventId: 1, ex, "时间转换报错");
                                                 //TError($"OCR取值时间：{ReturnData},格式转换错误{ex.Message}");
                                             }
                                             continue;
@@ -245,7 +246,7 @@ namespace AS.OCR.Service
             }
 
             //根据规则获取指定识别内容
-            Result GetValue(List<Word> words_result, int index, StoreOCRDetail StoreDetailRule)
+            Result<string> GetValue(List<Word> words_result, int index, StoreOCRDetail StoreDetailRule)
             {
                 var WordValue = "";
                 var Key = StoreDetailRule.OCRKey.Trim().Replace("：", "").Replace(":", "").ToLower().Split(',');
@@ -253,12 +254,12 @@ namespace AS.OCR.Service
                 {
                     var newWord = words_result[index].text.Replace("：", "").Replace(":", "");
                     if (!newWord.Contains(Key[0]))
-                        return new Result(false, "", WordValue);
+                        return FailRes();
                 }
                 else
                 {
                     if (!words_result[index].text.Contains(Key[0]) || !words_result[index].text.Contains(Key[1]))
-                        return new Result(false, "", WordValue);
+                        return FailRes();
                 }
 
                 switch (StoreDetailRule.GetValueWay)//可查看枚举注释
@@ -301,7 +302,7 @@ namespace AS.OCR.Service
                         break;
                 }
 
-                return new Result(true, "", WordValue);
+                return SuccessRes(WordValue);
             }
 
             //Str: 文字
@@ -326,18 +327,18 @@ namespace AS.OCR.Service
         /// </summary>
         /// <param name="receiptOCR"></param>
         /// <returns></returns>
-        private Result VerifyRecognition(ReceiptOCR receiptOCR)
+        private Result<string> VerifyRecognition(ReceiptOCR receiptOCR)
         {
             //识别的原始数据
             var RecongnizeModel = applyPictureRecongnizeDAO.Get(receiptOCR.RecongnizelId);
             if (RecongnizeModel == null)
-                return new Result(false, "校验失败：识别数据丢失，请重新识别小票！", null);
+                return FailRes("校验失败：识别数据丢失，请重新识别小票！");
 
             #region 检查数据是否篡改(Contain 不是绝对)
             ReceiptOCR OldReceipt = JsonConvert.DeserializeObject<ReceiptOCR>(RecongnizeModel.OCRResult);
             var result = CompareModel<ReceiptOCR>(OldReceipt, receiptOCR);
             if (!result.Success)
-                return new Result(false, "校验失败：提交数据与小票不一致！", null);
+                return FailRes("校验失败：提交数据与小票不一致！");
             #endregion
 
             #region 检查数据可靠性
@@ -348,9 +349,7 @@ namespace AS.OCR.Service
                 string.IsNullOrWhiteSpace(receiptOCR.MallName) ||
                 receiptOCR.TranAmount == 0 ||
                 receiptOCR.TransDatetime == DefaultDateTime || receiptOCR.TransDatetime == null)
-            {
-                return new Result(false, "校验失败：小票未识别完整！", null);
-            }
+                return FailRes("校验失败：小票未识别完整！");
             #endregion
 
             #region 匹配商铺规则
@@ -360,21 +359,21 @@ namespace AS.OCR.Service
                sqlWhere: $"and StoreId = '{receiptOCR.StoreId}'");
 
             if (StoreOCRRule == null)
-                return new Result(false, "校验失败：未配置积分规则！");
+                return FailRes("校验失败：未配置积分规则！");
 
             if (StoreOCRRule.Enabled != 1)
-                return new Result(false, "校验失败：商铺未启用自动积分");
+                return FailRes("校验失败：商铺未启用自动积分");
 
             if (StoreOCRRule.needVerify == 1) //当商铺启用校验规则
             {
                 if (receiptOCR.TranAmount < StoreOCRRule.MinValidReceiptValue || receiptOCR.TranAmount > StoreOCRRule.MaxValidReceiptValue)
-                    return new Result(false, "校验失败：小票金额不在店铺规则范围之内！");
+                    return FailRes("校验失败：小票金额不在店铺规则范围之内！");
 
                 if (StoreOCRRule.MaxTicketPerDay != 0)  //日自动交易笔数为0时 代表不限制
                 {
                     var TicketPerDay = applyPointDAO.GetApplyPointCountByDay(receiptOCR.StoreId); //当日交易笔数
                     if (TicketPerDay >= StoreOCRRule.MaxTicketPerDay)
-                        return new Result(false, "校验失败：今日已超过最大自动积分记录数量");
+                        return FailRes("校验失败：今日已超过最大自动积分记录数量");
                 }
 
                 Store StoreModel = GetCacheFromEntity<Store, Store>(
@@ -383,13 +382,13 @@ namespace AS.OCR.Service
                     sqlWhere: $" and StoreId = '{receiptOCR.StoreId}'");
 
                 if ((StoreModel.IsStandardPOS == "1" ? 0 : 1) != StoreOCRRule.POSType)
-                    return new Result(false, "校验失败：OCR商铺POS类型不一致");
+                    return FailRes("校验失败：OCR商铺POS类型不一致");
 
                 //POS门店代码暂无验证
             }
             #endregion
 
-            return new Result(true, "验证成功", null);
+            return SuccessRes<string>(null, "验证成功");
         }
 
         /// <summary>
@@ -398,7 +397,7 @@ namespace AS.OCR.Service
         /// </summary>
         /// <param name="applyPointRequest"></param>
         /// <returns></returns>
-        public Result CreateApplyPoint(ApplyPointRequest applyPointRequest)
+        public Result<string> CreateApplyPoint(ApplyPointRequest applyPointRequest)
         {
             //所有广场
             List<Mall> MallList = GetCacheFromEntity<Mall, List<Mall>>(
@@ -504,13 +503,13 @@ namespace AS.OCR.Service
             {
                 ApplyPoint.Status = 2;
                 applyPointDAO.Update(ApplyPoint);
-                return new Result(true, "提交积分申请成功，积分失败！", null);
+                return SuccessRes<string>(null, "提交积分申请成功，积分失败！");
             }
 
             ApplyPoint.Status = 1;
             applyPointDAO.Update(ApplyPoint);
 
-            return new Result(true, "积分申请成功！", null);
+            return SuccessRes<string>(null, "积分申请成功！");
         }
 
         /// <summary>
@@ -518,13 +517,12 @@ namespace AS.OCR.Service
         /// </summary>
         /// <param name="applyPointHistoryRequest"></param>
         /// <returns></returns>
-        public Result GetApplePointByCardId(ApplyPointHistoryRequest applyPointHistoryRequest)
+        public Result<List<ApplyPointModel>> GetApplePointByCardId(ApplyPointHistoryRequest applyPointHistoryRequest)
         {
 
             if (!Guid.TryParse(applyPointHistoryRequest.cardId, out var CardId))
                 TError("参数错误！");
-            List<ApplyPointModel> applyPointList = applyPointDAO.GetApplyPointHistory(CardId);
-            return new Result(true, "", applyPointList);
+            return SuccessRes(applyPointDAO.GetApplyPointHistory(CardId));
         }
 
         /// <summary>
@@ -532,10 +530,9 @@ namespace AS.OCR.Service
         /// </summary>
         /// <param name="webPosArg"></param>
         /// <returns></returns>
-        public async Task<Result> WebPosForPoint(WebPosArg webPosArg)
+        public async Task<Result<CmdResponse>> WebPosForPoint(WebPosArg webPosArg)
         {
-            //int amount = new Random(((unchecked((int)DateTime.Now.Millisecond + (int)DateTime.Now.Ticks)))).Next(10, 2000);
-            string testString = $@"<cmd type=""SALES"" appCode=""POS"">
+            string param = $@"<cmd type=""SALES"" appCode=""POS"">
                                         <shared offline=""true"">
                                                 <companyID>{webPosArg.companyID}</companyID>
                                                 <orgID>{webPosArg.orgID}</orgID>
@@ -550,27 +547,25 @@ namespace AS.OCR.Service
                                         payableAmount=""{webPosArg.amount}"" 
                                         verificationCode="""" />
                                    </cmd>";
-
+            logger.LogInformation($"【自动积分】调用webpos接口的参数 | 【{param}】 ");
             CmdResponse cmdResult = null;
             try
             {
                 WebPos.WebPOSSoapClient ws = new WebPos.WebPOSSoapClient(WebPos.WebPOSSoapClient.EndpointConfiguration.WebPOSSoap);
-                //Log.Warn($@"ws address:{ws.Endpoint.Address.Uri.AbsoluteUri}", null);
                 WebPos.WebPOSCredentials mwc = new WebPos.WebPOSCredentials();
-
-
                 mwc.Username = ConfigurationUtil.WebPosUserName;
                 var password = ConfigurationUtil.WebPosPassWord;
                 mwc.Password = ws.GetEncryptedCharAsync(password).Result;
-                cmdResult = await ws.CmdAsync(mwc, testString);
+                cmdResult = await ws.CmdAsync(mwc, param);
+                logger.LogInformation($"【自动积分】webpos接口返回参数 | 【{JsonConvert.SerializeObject(cmdResult)}】 ");
             }
             catch (Exception ex)
             {
                 TError($"WebPosForPoint异常：{ex.Message}");
             }
             if (!string.IsNullOrWhiteSpace(cmdResult.CmdResult) && cmdResult.CmdResult.Contains("hasError=\"false\""))
-                return new Result(true, "识别成功，完成自动积分且进行微信推送", cmdResult);
-            return new Result(false, $"验证通过，积分失败。", cmdResult);
+                return SuccessRes<CmdResponse>(cmdResult, "识别成功，完成自动积分且进行微信推送");
+            return FailRes<CmdResponse>($"验证通过，积分失败。");
         }
 
         /// <summary>
@@ -578,9 +573,10 @@ namespace AS.OCR.Service
         /// </summary>
         /// <param name="arg"></param>
         /// <returns></returns>
-        public async Task<Result> CommitApplyPoint(WebPosRequest arg)
+        public async Task<Result<CmdResponse>> CommitApplyPoint(WebPosRequest arg)
         {
             //"storecode=13160012&tillid=01&docno=S0020119000195&txdate=20190925&txtime=202208&amount=200.00&orgid=13&cashier=131600121&sign=E82DAADD6105BACFE6B2CC94C99253E2";
+            logger.LogInformation($"【CommitApplyPoint】 【params】:【{JsonConvert.SerializeObject(arg)}】");
             Dictionary<string, string> d = new Dictionary<string, string>();
             Regex re = new Regex(@"(^|&)?(\w+)=([^&]+)(&|$)?", RegexOptions.Compiled);
             MatchCollection mc = re.Matches(arg.arg);
@@ -637,8 +633,7 @@ namespace AS.OCR.Service
                 amount = amount,
             };
 
-            return WebPosForPoint(webPosArg).Result;
-
+            return await WebPosForPoint(webPosArg);
         }
     }
 }

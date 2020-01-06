@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace AS.OCR.Dapper.DAO
 {
-    public class ApplyPictureRecongnizeDAO : CrmInfrastructure<ApplyPictureRecongnize>
+    public class ApplyPictureRecongnizeDAO : Infrastructure<ApplyPictureRecongnize>
     {
     }
 }

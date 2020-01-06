@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using AS.OCR.Dapper.Base.DBContext;
 using Dapper.Contrib.Extensions;
 
 namespace AS.OCR.Dapper.Base
@@ -13,26 +12,26 @@ namespace AS.OCR.Dapper.Base
     /// 数据访问层 
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class OcrInfrastructure<T> : BaseInterFace<T> where T : class
+    public class Infrastructure<T> : BaseInterFace<T> where T : class
     {
         /// <summary>
         /// 增
         /// </summary>
         /// <param name="Entity"></param>
         /// <returns></returns>
-        public bool Add(T Entity) => OcrDBContext.Add(Entity) == 0 ? true : false;
+        public bool Add(T Entity) => DBContext.Add(Entity) == 0 ? true : false;
         /// <summary>
         /// 删
         /// </summary>
         /// <param name="Entity"></param>
         /// <returns></returns>
-        public bool Delete(T Entity) => OcrDBContext.Delete(Entity);
+        public bool Delete(T Entity) => DBContext.Delete(Entity);
         /// <summary>
         /// 改
         /// </summary>
         /// <param name="Entity"></param>
         /// <returns></returns>
-        public bool Update(T Entity) => OcrDBContext.Update(Entity);
+        public bool Update(T Entity) => DBContext.Update(Entity);
 
         /// <summary>
         /// 通过主键获取实体
@@ -66,7 +65,7 @@ namespace AS.OCR.Dapper.Base
         public T GetModel(string whereStr = "")
         {
             var sqlCondition = string.IsNullOrWhiteSpace(whereStr) ? "" : $" where {whereStr}";
-            return OcrDBContext.Query<T>($@"SELECT * FROM {typeof(T).Name} {sqlCondition}").FirstOrDefault();
+            return DBContext.Query<T>($@"SELECT * FROM {typeof(T).Name} {sqlCondition}").FirstOrDefault();
         }
         /// <summary>
         /// 获取当前子类实体集合
@@ -77,7 +76,7 @@ namespace AS.OCR.Dapper.Base
         public List<T> GetList(string whereStr = "")
         {
             var sqlCondition = string.IsNullOrWhiteSpace(whereStr) ? "" : $" where {whereStr}";
-            return OcrDBContext.Query<T>($@"SELECT * FROM {typeof(T).Name} {sqlCondition}").ToList();
+            return DBContext.Query<T>($@"SELECT * FROM {typeof(T).Name} {sqlCondition}").ToList();
         }
         /// <summary>
         /// 可通过业务实体
@@ -85,7 +84,7 @@ namespace AS.OCR.Dapper.Base
         /// <typeparam name="T"></typeparam>
         /// <param name="whereStr"></param>
         /// <returns></returns>
-        public S GetModelFromSql<S>(string sql) => OcrDBContext.QueryFirstOrDefault<S>(sql);
+        public S GetModelFromSql<S>(string sql) => DBContext.QueryFirstOrDefault<S>(sql);
 
         /// <summary>
         /// 可通过业务实体
@@ -93,7 +92,7 @@ namespace AS.OCR.Dapper.Base
         /// <typeparam name="T"></typeparam>
         /// <param name="whereStr"></param>
         /// <returns></returns>
-        public List<S> GetListFromSql<S>(string sql) => OcrDBContext.Query<S>(sql).ToList();
+        public List<S> GetListFromSql<S>(string sql) => DBContext.Query<S>(sql).ToList();
 
     }
 }

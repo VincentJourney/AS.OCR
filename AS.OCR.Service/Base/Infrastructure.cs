@@ -43,7 +43,7 @@ namespace AS.OCR.Service
                 {
                     if (!cacheHelper.Exists(Key))
                     {
-                        AS.OCR.Dapper.Base.CrmInfrastructure<T> infrastructure = new Dapper.Base.CrmInfrastructure<T>();
+                        AS.OCR.Dapper.Base.Infrastructure<T> infrastructure = new Dapper.Base.Infrastructure<T>();
                         if (typeof(Tretrun).IsGenericType)
                             Value = infrastructure.GetList(sqlWhere) as Tretrun;
                         else
@@ -87,7 +87,7 @@ namespace AS.OCR.Service
         /// </summary>
         /// <param name="base64Str"></param>
         /// <returns></returns>
-        public Result ImageUpload(string base64Str)
+        public Result<string> ImageUpload(string base64Str)
         {
             ImageRequest request = new ImageRequest()
             {
@@ -97,7 +97,7 @@ namespace AS.OCR.Service
                 fileDescription = "资源上传图片"
             };
             var result = HttpHelper.HttpPost(ConfigurationUtil.FileUploadUrl, JsonConvert.SerializeObject(request));
-            return new Result(true, "", result);
+            return SuccessRes(result);
         }
 
         /// <summary>
@@ -107,13 +107,13 @@ namespace AS.OCR.Service
         /// <param name="oldModel"></param>
         /// <param name="newModel"></param>
         /// <returns></returns>
-        public static Result CompareModel<T>(T oldModel, T newModel) where T : class
+        public static Result<string> CompareModel<T>(T oldModel, T newModel) where T : class
         {
             var oldInfo = oldModel.GetType().GetProperties();
             var newInfo = newModel.GetType().GetProperties();
 
             if (oldInfo.Count() == 0 || newInfo.Count() == 0)
-                return new Result(false, "校验失败：Entity Data Error");
+                return FailRes("校验失败：Entity Data Error");
 
             foreach (var item in oldInfo)
             {
@@ -122,9 +122,22 @@ namespace AS.OCR.Service
                     continue;
                 var newinfoObj = newInfo.Where(s => s.Name == item.Name).FirstOrDefault();
                 if (newinfoObj == null && !item.GetValue(oldModel, null).ToString().Contains(newinfoObj.GetValue(newModel, null).ToString()))
-                    return new Result(false, "校验失败：OCR数据与提交数据不一致");
+                    return FailRes("校验失败：OCR数据与提交数据不一致");
             }
-            return new Result(true);
+            return SuccessRes<string>();
         }
+
+        public static Result<T> SuccessRes<T>(T Data = null, string Mes = "") where T : class => Result<T>.SuccessRes(Data, Mes);
+        public static Result<T> FailRes<T>(string ErrorMes = "") where T : class => Result<T>.ErrorRes(ErrorMes);
+        public static Result<string> FailRes(string ErrorMes = "") => Result<string>.ErrorRes(ErrorMes);
+
+        /// <summary>
+        /// 将时间转换为小程序所需时间戳格式  https://tool.lu/timestamp/
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        protected Int64 GetResponseTime(DateTime? time)
+            => ((time ?? (new DateTime(1900, 1, 1))).ToUniversalTime().Ticks - 621355968000000000) / 10000000;
+
     }
 }

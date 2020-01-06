@@ -1,5 +1,4 @@
 ﻿using AS.OCR.Commom.Util;
-using AS.OCR.Dapper.Base.DapperHelper;
 using Dapper;
 using Dapper.Contrib.Extensions;
 using System.Collections.Generic;
@@ -7,13 +6,19 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AS.OCR.Dapper.Base.DBContext
+namespace AS.OCR.Dapper.Base
 {
-    public static class OcrDBContext
+    public static class DBContext
     {
-        private static readonly OcrDapperHelper helper = new OcrDapperHelper(ConfigurationUtil.OCR_ConnectionString);
         // 获取开启数据库的连接
-        public static IDbConnection Db { get => helper.OpenCurrentDbConnection(); }
+        public static IDbConnection Db
+        {
+            get
+            {
+                DapperHelper.GetInstance();
+                return DapperHelper.OpenCurrentDbConnection();
+            }
+        }
 
 
         /// <summary>
@@ -122,7 +127,7 @@ namespace AS.OCR.Dapper.Base.DBContext
         public static T GetModel<T>(string whereStr = "")
         {
             var sqlCondition = string.IsNullOrWhiteSpace(whereStr) ? "" : $" where {whereStr}";
-            return CrmDBContext.Query<T>($@"SELECT * FROM {typeof(T).Name} {sqlCondition}").FirstOrDefault();
+            return DBContext.Query<T>($@"SELECT * FROM {typeof(T).Name} {sqlCondition}").FirstOrDefault();
         }
 
 
@@ -135,7 +140,7 @@ namespace AS.OCR.Dapper.Base.DBContext
         public static List<T> GetList<T>(string whereStr = "")
         {
             var sqlCondition = string.IsNullOrWhiteSpace(whereStr) ? "" : $" where {whereStr}";
-            return CrmDBContext.Query<T>($@"SELECT * FROM {typeof(T).Name} {sqlCondition}").ToList();
+            return DBContext.Query<T>($@"SELECT * FROM {typeof(T).Name} {sqlCondition}").ToList();
         }
 
     }

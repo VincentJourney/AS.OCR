@@ -11,6 +11,11 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.IO;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace AS.OCR.Api
 {
@@ -28,9 +33,9 @@ namespace AS.OCR.Api
         {
             services.AddControllers();
 
-            services.AddSwaggerGen(c =>
+            services.AddSwaggerGen(s =>
             {
-                c.SwaggerDoc("OCR", new OpenApiInfo
+                s.SwaggerDoc("OCR", new OpenApiInfo
                 {
                     Title = "OCR API 2.0",
                     Version = "v2",
@@ -40,8 +45,49 @@ namespace AS.OCR.Api
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                c.IncludeXmlComments(xmlPath);
+                s.IncludeXmlComments(xmlPath);
+                //s.AddSecurityDefinition("Bearer", new OpenApiseSchema
+                //{
+                //    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                //    Name = "Authorization",//Jwt default param name
+                //    In = "header",//Jwt store address
+                //    Type = "apiKey"//Security scheme type
+                //});
+                //Add authentication type
+                //s.AddSecurityRequirement(new OpenApiSecurityRequirement("Bearer", new string[] { }));
             });
+
+            //services.AddAuthentication(s =>
+            // {
+            //     //2¡¢Authentication
+            //     s.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //     s.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            //     s.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            // }).AddJwtBearer(s =>
+            // {
+            //     //3¡¢Use Jwt bearer 
+            //     s.TokenValidationParameters = new TokenValidationParameters
+            //     {
+            //         ValidIssuer = issuer,
+            //         ValidAudience = audience,
+            //         IssuerSigningKey = key,
+            //         ClockSkew = expiration,
+            //         ValidateLifetime = true
+            //     };
+            //     s.Events = new JwtBearerEvents
+            //     {
+            //         OnAuthenticationFailed = context =>
+            //         {
+            //             //Token expired
+            //             if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+            //             {
+            //                 context.Response.Headers.Add("Token-Expired", "true");
+            //             }
+            //             return Task.CompletedTask;
+            //         }
+            //     };
+            // });
+
             services.AddMvcCore().AddRazorViewEngine();
         }
 

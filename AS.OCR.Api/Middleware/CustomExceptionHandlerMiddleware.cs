@@ -55,11 +55,10 @@ namespace AS.OCR.Api.Middleware
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-            await context.Response.WriteAsync(
-                JsonConvert.SerializeObject(
-                  Result.ErrorRes(e.Message)
-                  )
-                ).ConfigureAwait(false);
+            await context
+                .Response
+                .WriteAsync(JsonConvert.SerializeObject(Result<string>.ErrorRes(e.Message)))
+                .ConfigureAwait(false);
         }
     }
 }

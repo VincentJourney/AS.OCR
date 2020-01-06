@@ -29,8 +29,7 @@ namespace AS.OCR.Commom.Util
         /// <summary>
         /// 数据库连接
         /// </summary>
-        public static string CMR_ConnectionString => GetConfig<string>("CMR_ConnectionString");
-        public static string OCR_ConnectionString => GetConfig<string>("OCR_ConnectionString");
+        public static string ConnectionString => GetConfig<string>("ConnectionString");
 
         #region 腾讯OCR服务
         public static string TencentSecretId => GetConfig<string>("TencentConfig:SecretId");
@@ -96,6 +95,10 @@ namespace AS.OCR.Commom.Util
         /// 京基警告评率（警告线下N次提醒一次）
         /// </summary>
         public static int TencentOCR_KingKey_WarningHz => GetConfig<int>("TencentOCR_KingKey:WarningHz");
+        /// <summary>
+        /// JWT token key
+        /// </summary>
+        public static string TokenKey { get => "2c85758f40ff400ab26e0616f6398c37"; }
 
 
 
