@@ -6,6 +6,7 @@ using AS.OCR.Model.Business;
 using AS.OCR.Model.Request;
 using AS.OCR.Model.Response;
 using AS.OCR.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -14,6 +15,7 @@ namespace AS.OCR.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class PointController : ControllerBase
     {
         private ILogger _logger { get; set; }

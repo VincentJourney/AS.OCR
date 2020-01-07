@@ -16,6 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Swashbuckle.AspNetCore.Swagger;
+using System.Text;
 
 namespace AS.OCR.Api
 {
@@ -42,52 +43,37 @@ namespace AS.OCR.Api
                     Description = "OCR API 2.0"
                 });
 
+                //启用auth支持
+                s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey
+                });
+
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 s.IncludeXmlComments(xmlPath);
-                //s.AddSecurityDefinition("Bearer", new OpenApiseSchema
-                //{
-                //    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-                //    Name = "Authorization",//Jwt default param name
-                //    In = "header",//Jwt store address
-                //    Type = "apiKey"//Security scheme type
-                //});
-                //Add authentication type
-                //s.AddSecurityRequirement(new OpenApiSecurityRequirement("Bearer", new string[] { }));
             });
 
-            //services.AddAuthentication(s =>
-            // {
-            //     //2、Authentication
-            //     s.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            //     s.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            //     s.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            // }).AddJwtBearer(s =>
-            // {
-            //     //3、Use Jwt bearer 
-            //     s.TokenValidationParameters = new TokenValidationParameters
-            //     {
-            //         ValidIssuer = issuer,
-            //         ValidAudience = audience,
-            //         IssuerSigningKey = key,
-            //         ClockSkew = expiration,
-            //         ValidateLifetime = true
-            //     };
-            //     s.Events = new JwtBearerEvents
-            //     {
-            //         OnAuthenticationFailed = context =>
-            //         {
-            //             //Token expired
-            //             if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-            //             {
-            //                 context.Response.Headers.Add("Token-Expired", "true");
-            //             }
-            //             return Task.CompletedTask;
-            //         }
-            //     };
-            // });
-
+            //添加jwt验证：
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,//是否验证Issuer
+                        ValidateAudience = true,//是否验证Audience
+                        ValidateLifetime = true,//是否验证失效时间
+                        ClockSkew = TimeSpan.FromSeconds(30),
+                        ValidateIssuerSigningKey = true,//是否验证SecurityKey
+                        ValidAudience = "yourdomain.com",//Audience
+                        ValidIssuer = "yourdomain.com",//Issuer，这两项和前面签发jwt的设置一致
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(ConfigurationUtil.TokenKey))//拿到SecurityKey
+                    };
+                });
             services.AddMvcCore().AddRazorViewEngine();
         }
 
@@ -113,11 +99,13 @@ namespace AS.OCR.Api
                 option.DocumentTitle = "OCR API";
             });
 
-            app.UseHttpsRedirection();
+            app.UseHttpsRedirection(); 
 
             app.UseRouting();
 
             app.UseAuthorization();
+            //添加jwt验证
+            app.UseAuthentication();
 
             //更改默认静态文件目录
             app.UseStaticFiles(new StaticFileOptions

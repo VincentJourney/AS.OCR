@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AS.OCR.Model.Response;
 using AS.OCR.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -12,6 +13,7 @@ namespace AS.OCR.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize]
     public class AuthController : ControllerBase
     {
         private static readonly AuthService authService = new AuthService();
@@ -42,8 +44,8 @@ namespace AS.OCR.Api.Controllers
         //}
 
 
-
-        [HttpPost("Token")]
+        [AllowAnonymous]
+        [HttpGet("Token")]
         public IActionResult Token(string appid, string appsecret)
         {
             if (string.IsNullOrWhiteSpace(appid) || string.IsNullOrWhiteSpace(appsecret))

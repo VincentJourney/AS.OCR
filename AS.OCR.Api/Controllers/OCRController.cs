@@ -9,6 +9,7 @@ using AS.OCR.Model.Entity;
 using AS.OCR.Model.Request;
 using AS.OCR.Model.Response;
 using AS.OCR.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -18,6 +19,7 @@ namespace AS.OCR.Api.Controllers
 {
     [Produces("application/json")]
     [Route("api/ImageOCR")]
+    [Authorize]
     public class OCRController : ControllerBase
     {
         private ILogger _logger { get; set; }
@@ -51,5 +53,13 @@ namespace AS.OCR.Api.Controllers
             if (tencentCloudOCRRequest == null) throw new Exception("参数错误");
             return TencentOCR.GeneralAccurateOCR(tencentCloudOCRRequest.Image, tencentCloudOCRRequest.Type);
         }
+
+        [HttpGet]
+        public IActionResult Get()
+        {
+            return Ok("ok");
+        }
+
+
     }
 }
