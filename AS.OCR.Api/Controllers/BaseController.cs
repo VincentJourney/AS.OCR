@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AS.OCR.Api.Controllers
 {
-    public class BaseController : Controller
+    public class BaseController : ControllerBase
     {
-     
+
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using AS.OCR.Model.Response;
 using AS.OCR.Service;
@@ -14,7 +16,7 @@ namespace AS.OCR.Api.Controllers
     [Route("api/[controller]")]
     [ApiController]
     //[Authorize]
-    public class AuthController : ControllerBase
+    public class AuthController : BaseController
     {
         private static readonly AuthService authService = new AuthService();
         private ILogger logger;
@@ -22,28 +24,6 @@ namespace AS.OCR.Api.Controllers
         {
             logger = loggerFactory.CreateLogger(typeof(AuthController));
         }
-        //[HttpGet("CreateAppIdSecret")]
-        //public Result<AppIdSecret> CreateAppIdSecret(string name, string password)
-        //{
-        //    var base64Str1 = Convert.ToBase64String(Encoding.UTF8.GetBytes(name));
-        //    var base64Str2 = Convert.ToBase64String(Encoding.UTF8.GetBytes(password));
-        //    var AppIdSecret = new AppIdSecret { };
-        //    using (var md5 = MD5.Create())
-        //    {
-        //        var result = BitConverter.ToString(md5.ComputeHash(Encoding.UTF8.GetBytes(base64Str1))).Replace("-", "");
-        //        var result2 = BitConverter.ToString(md5.ComputeHash(Encoding.UTF8.GetBytes(base64Str2))).Replace("-", "");
-        //        AppIdSecret.appid = result.ToLower();
-        //        AppIdSecret.secret = result2.ToLower();
-        //    }
-        //    return Result<AppIdSecret>.SuccessRes(data: AppIdSecret);
-        //}
-        //public class AppIdSecret
-        //{
-        //    public string appid { get; set; }
-        //    public string secret { get; set; }
-        //}
-
-
         [AllowAnonymous]
         [HttpGet("Token")]
         public IActionResult Token(string appid, string appsecret)
@@ -53,5 +33,29 @@ namespace AS.OCR.Api.Controllers
 
             return Ok(authService.CreateToken(appid, appsecret));
         }
+        [AllowAnonymous]
+        [HttpGet("CreateAppIdSecret")]
+        public Result<AppIdSecret> CreateAppIdSecret(string name, string password)
+        {
+            var base64Str1 = Convert.ToBase64String(Encoding.UTF8.GetBytes(name));
+            var base64Str2 = Convert.ToBase64String(Encoding.UTF8.GetBytes(password));
+            var AppIdSecret = new AppIdSecret { };
+            using (var md5 = MD5.Create())
+            {
+                var result = BitConverter.ToString(md5.ComputeHash(Encoding.UTF8.GetBytes(base64Str1))).Replace("-", "");
+                var result2 = BitConverter.ToString(md5.ComputeHash(Encoding.UTF8.GetBytes(base64Str2))).Replace("-", "");
+                AppIdSecret.appid = result.ToLower();
+                AppIdSecret.secret = result2.ToLower();
+            }
+            return Result<AppIdSecret>.SuccessRes(data: AppIdSecret);
+        }
+        public class AppIdSecret
+        {
+            public string appid { get; set; }
+            public string secret { get; set; }
+        }
+
+
+
     }
 }

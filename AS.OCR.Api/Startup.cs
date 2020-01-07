@@ -42,16 +42,29 @@ namespace AS.OCR.Api
                     Version = "v2",
                     Description = "OCR API 2.0"
                 });
-
                 //启用auth支持
                 s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                    Description = "请在此输入您的Token，ex: 'Bearer {token}'",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.ApiKey
                 });
 
+                s.AddSecurityRequirement(
+                    new OpenApiSecurityRequirement
+                    {
+                        {
+                        new OpenApiSecurityScheme{
+                            Reference=new OpenApiReference{
+                                Type=ReferenceType.SecurityScheme,
+                                Id="Bearer"
+                            }
+                        },
+                        new string[]{ }
+                        }
+                    }
+               );
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
@@ -67,14 +80,18 @@ namespace AS.OCR.Api
                         ValidateIssuer = true,//是否验证Issuer
                         ValidateAudience = true,//是否验证Audience
                         ValidateLifetime = true,//是否验证失效时间
-                        ClockSkew = TimeSpan.FromSeconds(30),
+                        ClockSkew = TimeSpan.FromMinutes(30),
                         ValidateIssuerSigningKey = true,//是否验证SecurityKey
-                        ValidAudience = "yourdomain.com",//Audience
-                        ValidIssuer = "yourdomain.com",//Issuer，这两项和前面签发jwt的设置一致
+                        ValidAudience = "http://localhost:5000",//Audience
+                        ValidIssuer = "http://localhost:5000",//Issuer，这两项和前面签发jwt的设置一致
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(ConfigurationUtil.TokenKey))//拿到SecurityKey
                     };
                 });
-            services.AddMvcCore().AddRazorViewEngine();
+
+            services.AddAuthorization();
+
+            services.AddMvcCore(s => s.Filters.Add(typeof(AuthorizationFilter)))
+                .AddRazorViewEngine();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -84,6 +101,7 @@ namespace AS.OCR.Api
             {
                 app.UseDeveloperExceptionPage();
             }
+
             app.UseMiddleware(typeof(CustomExceptionHandlerMiddleware));//全局异常
 
             ExceptionlessClient.Default.Configuration.ApiKey = ConfigurationUtil.Exceptionless_ApiKey;
@@ -99,13 +117,13 @@ namespace AS.OCR.Api
                 option.DocumentTitle = "OCR API";
             });
 
-            app.UseHttpsRedirection(); 
+            app.UseHttpsRedirection();
 
             app.UseRouting();
-
-            app.UseAuthorization();
-            //添加jwt验证
+            //认证
             app.UseAuthentication();
+            //授权
+            app.UseAuthorization();
 
             //更改默认静态文件目录
             app.UseStaticFiles(new StaticFileOptions
@@ -113,6 +131,8 @@ namespace AS.OCR.Api
                 FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Script")),
                 RequestPath = "/Script"
             });
+
+            //app.UseMiddleware();
 
             app.UseEndpoints(endpoints =>
             {

@@ -38,8 +38,8 @@ namespace AS.OCR.Service
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(ConfigurationUtil.TokenKey));
             var token = new JwtSecurityToken(
-                issuer: "yourdomain.com",
-                audience: "yourdomain.com",
+                issuer: "http://localhost:5000",
+                audience: "http://localhost:5000",
                 claims: claims,
                 expires: expiredtime,
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
@@ -48,7 +48,7 @@ namespace AS.OCR.Service
             return new TokenResponse
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token),
-                expiryTime = GetResponseTime(expiredtime)
+                expiryTime = expiredtime
             };
         }
     }

@@ -14,7 +14,7 @@ namespace AS.OCR.Api.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class FileController : ControllerBase
+    public class FileController : BaseController
     {
         private ILogger _logger { get; set; }
         private OCRService oCRService;

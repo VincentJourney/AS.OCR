@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,7 +22,7 @@ namespace AS.OCR.Api.Controllers
     [Produces("application/json")]
     [Route("api/ImageOCR")]
     [Authorize]
-    public class OCRController : ControllerBase
+    public class OCRController : BaseController
     {
         private ILogger _logger { get; set; }
         private OCRService oCRService;
@@ -57,7 +59,11 @@ namespace AS.OCR.Api.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok("ok");
+            var identity = HttpContext.User;
+            var id = identity.Claims.FirstOrDefault(u => u.Type == ClaimTypes.UserData).Value;
+            var AppId = identity.Claims.FirstOrDefault(u => u.Type == ClaimTypes.Sid).Value;
+            var AppSecret = identity.Claims.FirstOrDefault(u => u.Type == ClaimTypes.PrimarySid).Value;
+            return Ok(new { id = id, appid = AppId, AppSecret = AppSecret });
         }
 
 
