@@ -32,14 +32,14 @@ namespace AS.OCR.Api.Controllers
         /// <param name="applyPointRequest"></param>
         /// <returns></returns>
         [HttpPost("ApplyPoint")]
-        public Result<string> ApplyPoint([FromBody]ApplyPointRequest applyPointRequest)
+        public IActionResult ApplyPoint([FromBody]CreateApplyPointRequest applyPointRequest)
         {
             if (applyPointRequest == null ||
                 string.IsNullOrWhiteSpace(applyPointRequest.cardId) ||
                  string.IsNullOrWhiteSpace(applyPointRequest.mallId) ||
                 applyPointRequest.receiptOCR == null)
                 throw new Exception("参数错误");
-            return oCRService.CreateApplyPoint(applyPointRequest);
+            return SuccessRes(oCRService.CreateApplyPoint(applyPointRequest));
         }
 
         /// <summary>
@@ -48,10 +48,10 @@ namespace AS.OCR.Api.Controllers
         /// <param name="applyPointHistoryRequest"></param>
         /// <returns></returns>
         [HttpPost("ApplyPointHistory")]
-        public Result<List<ApplyPointModel>> ApplyPointHistory([FromBody]ApplyPointHistoryRequest applyPointHistoryRequest)
+        public IActionResult ApplyPointHistory([FromBody]ApplyPointHistoryRequest applyPointHistoryRequest)
         {
             if (applyPointHistoryRequest == null) throw new Exception("参数错误");
-            return oCRService.GetApplePointByCardId(applyPointHistoryRequest);
+            return SuccessRes(oCRService.GetApplePointByCardId(applyPointHistoryRequest));
         }
 
         /// <summary>
@@ -60,11 +60,11 @@ namespace AS.OCR.Api.Controllers
         /// <param name="req"></param>
         /// <returns></returns>
         [HttpPost("WebPosForPoint")]
-        public async Task<Result<WebPos.CmdResponse>> WebPosForPoint([FromBody]WebPosRequest req)
+        public IActionResult WebPosForPoint([FromBody]WebPosRequest req)
         {
             if (req == null || string.IsNullOrWhiteSpace(req.arg) || string.IsNullOrWhiteSpace(req.cardId))
                 throw new Exception("参数错误");
-            return await oCRService.CommitApplyPoint(req);
+            return SuccessRes(oCRService.CommitApplyPoint(req));
         }
     }
 }

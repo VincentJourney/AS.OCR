@@ -20,23 +20,29 @@ namespace AS.OCR.Api.Controllers
     {
         private static readonly AuthService authService = new AuthService();
         private ILogger logger;
+
         public AuthController(ILoggerFactory loggerFactory)
         {
             logger = loggerFactory.CreateLogger(typeof(AuthController));
         }
+
+
         [AllowAnonymous]
         [HttpGet("Token")]
         public IActionResult Token(string appid, string appsecret)
         {
             if (string.IsNullOrWhiteSpace(appid) || string.IsNullOrWhiteSpace(appsecret))
-                return BadRequest(Result<string>.ErrorRes("参数错误"));
+                return FailRes("参数错误");
 
-            return Ok(authService.CreateToken(appid, appsecret));
+            return SuccessRes(authService.CreateToken(appid, appsecret));
         }
+
         [AllowAnonymous]
         [HttpGet("CreateAppIdSecret")]
-        public Result<AppIdSecret> CreateAppIdSecret(string name, string password)
+        public IActionResult CreateAppIdSecret(string name, string password)
         {
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(password))
+                return FailRes("参数错误");
             var base64Str1 = Convert.ToBase64String(Encoding.UTF8.GetBytes(name));
             var base64Str2 = Convert.ToBase64String(Encoding.UTF8.GetBytes(password));
             var AppIdSecret = new AppIdSecret { };
@@ -47,7 +53,7 @@ namespace AS.OCR.Api.Controllers
                 AppIdSecret.appid = result.ToLower();
                 AppIdSecret.secret = result2.ToLower();
             }
-            return Result<AppIdSecret>.SuccessRes(data: AppIdSecret);
+            return SuccessRes(AppIdSecret);
         }
         public class AppIdSecret
         {

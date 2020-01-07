@@ -29,6 +29,7 @@ namespace AS.OCR.Api.Controllers
         /// <param name="Base64"></param>
         /// <returns></returns>
         [HttpPost("FileUpLoad")]
-        public Result<string> ImageUpLoad([FromBody]string Base64) => oCRService.ImageUpload(Base64);
+        public IActionResult ImageUpLoad([FromBody]string Base64) 
+            => SuccessRes(oCRService.ImageUpload(Base64));
     }
 }

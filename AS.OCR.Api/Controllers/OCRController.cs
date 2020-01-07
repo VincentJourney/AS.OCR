@@ -38,10 +38,10 @@ namespace AS.OCR.Api.Controllers
         /// <param name="oCRRequest"></param>
         /// <returns></returns>
         [HttpPost("Receipt")]
-        public async Task<Result<ReceiptOCR>> Receipt([FromBody]OCRRequest oCRRequest)
+        public IActionResult Receipt([FromBody]OCRRequest oCRRequest)
         {
             if (oCRRequest == null) throw new Exception("参数错误");
-            return await oCRService.ReceiptOCR(oCRRequest);
+            return SuccessRes(oCRService.ReceiptOCR(oCRRequest));
         }
 
         /// <summary>
@@ -50,20 +50,20 @@ namespace AS.OCR.Api.Controllers
         /// <param name="tencentCloudOCRRequest"></param>
         /// <returns></returns>
         [HttpPost("TencentCloudOCR")]
-        public TencentOCRResult TencentCloudOCR([FromBody]TencentCloudOCRRequest tencentCloudOCRRequest)
+        public IActionResult TencentCloudOCR([FromBody]TencentCloudOCRRequest tencentCloudOCRRequest)
         {
             if (tencentCloudOCRRequest == null) throw new Exception("参数错误");
-            return TencentOCR.GeneralAccurateOCR(tencentCloudOCRRequest.Image, tencentCloudOCRRequest.Type);
+            return SuccessRes(TencentOCR.GeneralAccurateOCR(tencentCloudOCRRequest.Image, tencentCloudOCRRequest.Type));
         }
 
-        [HttpGet]
+        [HttpGet("values")]
         public IActionResult Get()
         {
             var identity = HttpContext.User;
             var id = identity.Claims.FirstOrDefault(u => u.Type == ClaimTypes.UserData).Value;
             var AppId = identity.Claims.FirstOrDefault(u => u.Type == ClaimTypes.Sid).Value;
             var AppSecret = identity.Claims.FirstOrDefault(u => u.Type == ClaimTypes.PrimarySid).Value;
-            return Ok(new { id = id, appid = AppId, AppSecret = AppSecret });
+            return SuccessRes(new { id = id, appid = AppId, AppSecret = AppSecret });
         }
 
 

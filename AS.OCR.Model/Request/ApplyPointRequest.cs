@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace AS.OCR.Model.Request
 {
-    public class ApplyPointRequest
+    public class CreateApplyPointRequest
     {
-        public string cardId { get; set; }
-        public string mallId { get; set; }
+        public string UnionId { get; set; }
         public ReceiptOCR receiptOCR { get; set; }
     }
 }
