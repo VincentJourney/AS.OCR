@@ -29,11 +29,8 @@ namespace AS.OCR.Model.Enum
         /// <summary>
         /// 广场名称
         /// </summary>
-        MallName,
-
+        MallName
     }
-
-
     /// <summary>
     /// 取值方法
     /// </summary>
@@ -58,6 +55,6 @@ namespace AS.OCR.Model.Enum
         /// <summary>
         /// 关键字间
         /// </summary>
-        BetweenOCRKey,
+        BetweenOCRKey
     }
 }

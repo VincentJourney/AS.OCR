@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace AS.OCR.Model.Request
 {
-    public class OCRRequest
+    public class ReceiptRequest
     {
-        public string mallId { get; set; }
         public string imageUrl { get; set; }
         public int? Type { get; set; }
     }

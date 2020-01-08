@@ -10,5 +10,7 @@ namespace AS.OCR.Service
     {
         private static readonly AccountDAO accountDAO = new AccountDAO();
         public Account GetByAppId(string AppId) => accountDAO.GetByAppId($"AppId='{AppId}'");
+
+        public Account Get(Guid Id) => accountDAO.Get(Id);
     }
 }

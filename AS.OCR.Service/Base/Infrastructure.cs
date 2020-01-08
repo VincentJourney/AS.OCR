@@ -14,7 +14,6 @@ namespace AS.OCR.Service
 {
     public class Infrastructure
     {
-        private static CacheHelper cacheHelper = new CacheHelper();
         /// <summary>
         /// 缓存锁  避免并发设置缓存增加DB压力
         /// </summary>
@@ -36,12 +35,13 @@ namespace AS.OCR.Service
             where T : AbstractEntity where Tretrun : class
         {
             Tretrun Value = default;
-            if (cacheHelper.Exists(Key)) Value = cacheHelper.Get<T>(Key) as Tretrun;
+            if (PooledRedisClientHelper.ContainsKey(Key))
+                Value = PooledRedisClientHelper.GetT<T>(Key) as Tretrun;
             else
             {
                 lock (cacheLocker)//避免缓存并发
                 {
-                    if (!cacheHelper.Exists(Key))
+                    if (!PooledRedisClientHelper.ContainsKey(Key))
                     {
                         AS.OCR.Dapper.Base.Infrastructure<T> infrastructure = new Dapper.Base.Infrastructure<T>();
                         if (typeof(Tretrun).IsGenericType)
@@ -51,7 +51,7 @@ namespace AS.OCR.Service
                     }
                 }
                 if (Hour != 0) //有效时长设置为0时 不设置缓存
-                    if (Value != null) cacheHelper.Set(Key, Value, TimeSpan.FromHours(Hour));
+                    if (Value != null) PooledRedisClientHelper.Set(Key, Value, TimeSpan.FromHours(Hour));
             }
             return Value;
         }
@@ -69,13 +69,13 @@ namespace AS.OCR.Service
         public static T GetCacheData<P, T>(string Key, double Hour, Func<P, T> func, P param) where T : class
         {
             T Value = default;
-            if (cacheHelper.Exists(Key))
-                Value = cacheHelper.Get<T>(Key);
+            if (PooledRedisClientHelper.ContainsKey(Key))
+                Value = PooledRedisClientHelper.GetT<T>(Key);
             else
                 Value = func(param);
             if (Hour != 0) //有效时长设置为0时 不设置缓存
                 if (Value != null)
-                    cacheHelper.Set(Key, Value, TimeSpan.FromHours(Hour));
+                    PooledRedisClientHelper.Set(Key, Value, TimeSpan.FromHours(Hour));
             return Value;
         }
 

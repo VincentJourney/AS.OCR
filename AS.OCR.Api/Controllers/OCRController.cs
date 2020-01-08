@@ -20,7 +20,7 @@ using Newtonsoft.Json;
 namespace AS.OCR.Api.Controllers
 {
     [Produces("application/json")]
-    [Route("api/ImageOCR")]
+    [Route("api/[controller]")]
     [Authorize]
     public class OCRController : BaseController
     {
@@ -35,13 +35,13 @@ namespace AS.OCR.Api.Controllers
         /// <summary>
         /// 图片识别 
         /// </summary>
-        /// <param name="oCRRequest"></param>
+        /// <param name="receiptRequest"></param>
         /// <returns></returns>
         [HttpPost("Receipt")]
-        public IActionResult Receipt([FromBody]OCRRequest oCRRequest)
+        public async Task<IActionResult> Receipt([FromBody]ReceiptRequest receiptRequest)
         {
-            if (oCRRequest == null) throw new Exception("参数错误");
-            return SuccessRes(oCRService.ReceiptOCR(oCRRequest));
+            if (receiptRequest == null) throw new Exception("参数错误");
+            return SuccessRes(await oCRService.ReceiptOCR(receiptRequest));
         }
 
         /// <summary>
@@ -65,7 +65,5 @@ namespace AS.OCR.Api.Controllers
             var AppSecret = identity.Claims.FirstOrDefault(u => u.Type == ClaimTypes.PrimarySid).Value;
             return SuccessRes(new { id = id, appid = AppId, AppSecret = AppSecret });
         }
-
-
     }
 }

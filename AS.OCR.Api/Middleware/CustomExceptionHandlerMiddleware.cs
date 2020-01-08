@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace AS.OCR.Api.Middleware
 {
     /// <summary>
-    /// 全局
+    /// 全局异常
     /// </summary>
     public class CustomExceptionHandlerMiddleware
     {
@@ -42,21 +42,23 @@ namespace AS.OCR.Api.Middleware
             if (e == null) return;
 
             var info = context.GetRequestInfo(ExceptionlessClient.Default.Configuration);
-            var postData = info?.PostData?.ToString();
-            var data = postData.Replace("\n", "").Replace(" ", "");
-            var mes = $@"【本机IP : {info?.Host} 】| 【接口路由 : {info?.Path}】 | 【客户端IP地址 : {info?.ClientIpAddress}】 | 【入参 : {data}】 | 【出参 : 】";
-
-            var exceptionMes = $"{mes} | 【异常信息 ： {e.Message}】 | 【堆栈信息 ： {e.StackTrace}】";
-
+            var postData = info?.PostData?.ToString().Replace("\n", "").Replace(" ", "");
+            var QueryString = JsonConvert.SerializeObject(info.QueryString);
+            var mes = $@"【本机IP : {info?.Host} 】
+【客户端IP地址 : {info?.ClientIpAddress}】 
+【接口路由 : {info?.Path}】
+【QueryString : {QueryString}】
+【PostData : {postData}】
+【异常信息 ：{e.Message}】
+【堆栈信息 ：{e.StackTrace}】";
             if (ConfigurationUtil.Exceptionless_Enabled)
                 e.ToExceptionless().AddObject(mes, "HttpContextInfo").Submit();
             else
-                _log.LogError(exceptionMes);
+                _log.LogError(mes);
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-            await context
-                .Response
+            await context.Response
                 .WriteAsync(JsonConvert.SerializeObject(Result<string>.ErrorRes(e.Message)))
                 .ConfigureAwait(false);
         }

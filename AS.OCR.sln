@@ -17,7 +17,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AS.OCR.Extension", "AS.OCR.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AS.OCR.Extension.SDK", "AS.OCR.Extension.SDK\AS.OCR.Extension.SDK.csproj", "{DB2F7AC3-5498-4388-8895-550890D5FAE7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AS.OCR.Service.UnitTest", "AS.OCR.Service.UnitTest\AS.OCR.Service.UnitTest.csproj", "{F78187AC-D49A-4299-97AD-2B3256D20A0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AS.OCR.Service.UnitTest", "AS.OCR.Service.UnitTest\AS.OCR.Service.UnitTest.csproj", "{F78187AC-D49A-4299-97AD-2B3256D20A0F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AS.OCR.Infrastructure", "AS.OCR.Infrastructure", "{A1D222F5-071F-407F-AB4D-DF0ED387E7E9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AS.OCR.Domain", "AS.OCR.Domain", "{D47E0623-CEE9-453F-8D39-1F8C414A22B7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

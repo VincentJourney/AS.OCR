@@ -152,6 +152,25 @@ namespace AS.OCR.Commom.Util
         }
 
         /// <summary>
+        /// 设置key,传入泛型格式和时间戳
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="exp"></param>
+        public static void Set<T>(string key, T value, TimeSpan exp)
+        {
+            using (IRedisClient redis = PooleClient.GetClient())
+            {
+                if (!redis.Set(key, value, exp))
+                {
+                    if (redis.ContainsKey(key) && !redis.Remove(key))
+                        throw new Exception(string.Format("redis产生脏数据,{0}=>{1}", key, value));
+                }
+            }
+        }
+
+        /// <summary>
         /// 删除key
         /// </summary>
         /// <param name="key"></param>

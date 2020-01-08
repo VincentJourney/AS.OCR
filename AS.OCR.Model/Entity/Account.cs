@@ -5,11 +5,9 @@ using System.Text;
 
 namespace AS.OCR.Model.Entity
 {
-    [Table("ApplyPoint")]
+    [Table("Account")]
     public class Account : AbstractEntity
     {
-        [ExplicitKey]
-        public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public string AccountName { get; set; }
         public string AppId { get; set; }

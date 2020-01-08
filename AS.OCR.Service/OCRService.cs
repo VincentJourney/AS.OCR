@@ -27,28 +27,25 @@ namespace AS.OCR.Service
         private static readonly object cacheLocker = new object();
         private ILogger logger;
 
-        private StoreDAO storeDAO = new StoreDAO();
-        private ApplyPictureRecongnizeDAO applyPictureRecongnizeDAO = new ApplyPictureRecongnizeDAO();
-        private ApplyPointDAO applyPointDAO = new ApplyPointDAO();
-        private CardDAO cardDAO = new CardDAO();
+        private OCRLogDAO OCRLogDAO = new OCRLogDAO();
 
         public OCRService(ILoggerFactory loggerFactory)
         {
             logger = loggerFactory.CreateLogger(typeof(OCRService));
         }
+
         /// <summary>
-        /// 图片识别
+        /// 
         /// </summary>
         /// <param name="oCRRequest"></param>
-        /// <returns>识别结果</returns>
-        public async Task<Result<ReceiptOCR>> ReceiptOCR(OCRRequest oCRRequest)
+        /// <returns></returns>
+        public async Task<ReceiptOCRResponse> ReceiptOCR(ReceiptRequest oCRRequest)
         {
             var imageUrl = "";
             if (oCRRequest.Type == null || oCRRequest.Type == 1)
                 imageUrl = oCRRequest.imageUrl;
             return await Task.Run(() =>
                 RecognitOCRResult(TencentOCR.GeneralAccurateOCR(oCRRequest.imageUrl, oCRRequest.Type),
-                                  oCRRequest.mallId,
                                   imageUrl));
         }
 
@@ -59,28 +56,24 @@ namespace AS.OCR.Service
         /// <param name="mallId"></param>
         /// <param name="ImageUrl"></param>
         /// <returns></returns>
-        private Result<ReceiptOCR> RecognitOCRResult(TencentOCRResult OcrResult, string mallId, string ImageUrl)
+        private ReceiptOCRResponse RecognitOCRResult(TencentOCRResult OcrResult, string ImageUrl)
         {
-            if (string.IsNullOrWhiteSpace(mallId))
-                TError("请选择 Mall");
-
             List<Word> WordList = OcrResult.WordList.Select(s => new Word { text = s.text }).ToList();
             //查询所有的商铺规则并缓存
-            List<StoreOCRDetail> AllStoreOCRDetailRuleList = GetCacheFromEntity<StoreOCRDetail, List<StoreOCRDetail>>(
-                Key: "AllStoreOCRDetailRuleList",
+            List<OCRVerifyRule> OCRVerifyRuleList = GetCacheFromEntity<OCRVerifyRule, List<OCRVerifyRule>>(
+                Key: "OCRVerifyRuleList",
                 Hour: ConfigurationUtil.CacheExpiration_StoreOCRDetailRuleList);
             //最后识别结果
-            var ReceiptOCRModel = new ReceiptOCR
+            var ReceiptOCRModel = new ReceiptOCRResponse
             {
                 StoreId = Guid.Empty,
                 StoreName = "",
-                StoreCode = "",
                 ReceiptNo = "",
                 TranAmount = 0,
                 TransDatetime = null,
                 RecongnizelId = Guid.Empty,
-                Base64 = ImageUrl,
-                MallName = ""
+                AccountId = AccountInfo.Account.Id,
+                AccountName = AccountInfo.Account.AccountName
             };
 
             //配置广场的规则：识别小票后与规则对比？   
@@ -89,11 +82,11 @@ namespace AS.OCR.Service
             //3，确定 mall
             //4，拿到规则
             //所有广场
-            #region 匹配商铺信息  
-            var StoreNameRuleList = AllStoreOCRDetailRuleList
-                .Where(s => s.OCRKeyType == (int)OCRKeyType.StoreName).ToList();
-            List<Store> recognitionList = new List<Store>();
-            foreach (var Detail in StoreNameRuleList)
+            #region 匹配 商铺 广场 信息  
+            var StoreRuleList = OCRVerifyRuleList
+                .Where(s => s.KeyType == (int)OCRKeyType.StoreName).ToList();
+            List<Store> IdentifiedStoreList = new List<Store>(); //识别的商铺集合
+            foreach (var Detail in StoreRuleList)
             {
                 foreach (var word in WordList)
                 {
@@ -101,22 +94,20 @@ namespace AS.OCR.Service
                     if (word.text.Contains(key))//只需要小票包含关键字
                     {
                         //根据小票关键字找到规则所在的StoreId，加上前端传来的mallid
-                        var recognitionModel = storeDAO.Get(Detail.StoreId);
-                        if (recognitionModel != null)
-                            recognitionList.Add(recognitionModel);
+                        var IdentifiedStore = storeDAO.Get(Detail.StoreId);
+                        if (IdentifiedStore != null)
+                            IdentifiedStoreList.Add(IdentifiedStore);
                     }
                 }
             }
 
-            List<Mall> MallList = GetCacheFromEntity<Mall, List<Mall>>(
-                Key: "AllMall",
-                Hour: ConfigurationUtil.CacheExpiration_Mall);
+            List<Mall> MallList = null;
             Store StoreModel = null;
-            if (recognitionList != null && recognitionList.Count() > 0)
+            if (IdentifiedStoreList != null && IdentifiedStoreList.Count() > 0)
             {
-                foreach (var item in recognitionList)
+                foreach (var item in IdentifiedStoreList)
                 {
-                    var mallnamekey = AllStoreOCRDetailRuleList.Where(s => s.StoreId == item.StoreId
+                    var mallnamekey = OCRVerifyRuleList.Where(s => s.StoreId == item.StoreId
                     && s.OCRKeyType == (int)OCRKeyType.MallName).Select(s => s.OCRKey).FirstOrDefault();
                     if (!string.IsNullOrWhiteSpace(mallnamekey))
                     {
@@ -139,7 +130,7 @@ namespace AS.OCR.Service
             ReceiptOCRModel.StoreCode = StoreModel?.StoreCode ?? "";
 
             //当前店铺的规则明细
-            var ThisStoreOCRDetail = AllStoreOCRDetailRuleList.Where(s => s.StoreId == StoreId).OrderByDescending(s => s.AddedOn).ToList();
+            var ThisStoreOCRDetail = OCRVerifyRuleList.Where(s => s.StoreId == StoreId).OrderByDescending(s => s.AddedOn).ToList();
             #endregion
 
             //根据店铺规则明细 关键字类型 关键字 取值方法 匹配识别结果
@@ -161,10 +152,10 @@ namespace AS.OCR.Service
 
             ReceiptOCRModel.RecongnizelId = RecongnizeModelId;
 
-            return SuccessRes(ReceiptOCRModel, "识别成功");
+            return ReceiptOCRModel;
 
             //匹配
-            ReceiptOCR Matching(List<Word> WordList, ReceiptOCR ReceiptOCRModel, List<StoreOCRDetail> ThisStoreOCRDetail)
+            ReceiptOCRResponse Matching(List<Word> WordList, ReceiptOCRResponse ReceiptOCRModel, List<OCRVerifyRule> ThisStoreOCRDetail)
             {
                 for (int i = 0; i < WordList.Count(); i++)
                 {
@@ -246,7 +237,7 @@ namespace AS.OCR.Service
             }
 
             //根据规则获取指定识别内容
-            Result<string> GetValue(List<Word> words_result, int index, StoreOCRDetail StoreDetailRule)
+            Result<string> GetValue(List<Word> words_result, int index, OCRVerifyRule StoreDetailRule)
             {
                 var WordValue = "";
                 var Key = StoreDetailRule.OCRKey.Trim().Replace("：", "").Replace(":", "").ToLower().Split(',');

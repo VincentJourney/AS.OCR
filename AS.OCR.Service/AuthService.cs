@@ -17,12 +17,17 @@ namespace AS.OCR.Service
 
         public TokenResponse CreateToken(string appid, string appsecret)
         {
-            //PooledRedisClientHelper.Set<string>()
             var account = accountDAO.GetByAppId(appid);
             if (account == null || account.AppSecret != appsecret || account.Status == 0)
                 throw new Exception("账号不存在或账号未启用");
 
-            return BuildToken(account);
+            var RedisKey = $"GetToken_AppId_{appid}";
+            if (PooledRedisClientHelper.ContainsKey(RedisKey))
+                return PooledRedisClientHelper.GetT<TokenResponse>(RedisKey);
+
+            var token = BuildToken(account);
+            PooledRedisClientHelper.Set<TokenResponse>(RedisKey, token, TimeSpan.FromMinutes(30));
+            return token;
         }
 
         private TokenResponse BuildToken(Account account)

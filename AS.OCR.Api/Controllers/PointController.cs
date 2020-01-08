@@ -34,12 +34,14 @@ namespace AS.OCR.Api.Controllers
         [HttpPost("ApplyPoint")]
         public IActionResult ApplyPoint([FromBody]CreateApplyPointRequest applyPointRequest)
         {
-            if (applyPointRequest == null ||
-                string.IsNullOrWhiteSpace(applyPointRequest.cardId) ||
-                 string.IsNullOrWhiteSpace(applyPointRequest.mallId) ||
-                applyPointRequest.receiptOCR == null)
-                throw new Exception("参数错误");
-            return SuccessRes(oCRService.CreateApplyPoint(applyPointRequest));
+            //if (applyPointRequest == null ||
+            //    string.IsNullOrWhiteSpace(applyPointRequest.cardId) ||
+            //     string.IsNullOrWhiteSpace(applyPointRequest.mallId) ||
+            //    applyPointRequest.receiptOCR == null)
+            //    throw new Exception("参数错误");
+            //return SuccessRes(oCRService.CreateApplyPoint(applyPointRequest));
+
+            return SuccessRes("");
         }
 
         /// <summary>
@@ -50,8 +52,10 @@ namespace AS.OCR.Api.Controllers
         [HttpPost("ApplyPointHistory")]
         public IActionResult ApplyPointHistory([FromBody]ApplyPointHistoryRequest applyPointHistoryRequest)
         {
-            if (applyPointHistoryRequest == null) throw new Exception("参数错误");
-            return SuccessRes(oCRService.GetApplePointByCardId(applyPointHistoryRequest));
+            //if (applyPointHistoryRequest == null) throw new Exception("参数错误");
+            //return SuccessRes(oCRService.GetApplePointByCardId(applyPointHistoryRequest));
+
+            return SuccessRes("");
         }
 
         /// <summary>
@@ -64,7 +68,8 @@ namespace AS.OCR.Api.Controllers
         {
             if (req == null || string.IsNullOrWhiteSpace(req.arg) || string.IsNullOrWhiteSpace(req.cardId))
                 throw new Exception("参数错误");
-            return SuccessRes(oCRService.CommitApplyPoint(req));
+            //return SuccessRes(oCRService.CommitApplyPoint(req));
+            return SuccessRes("");
         }
     }
 }

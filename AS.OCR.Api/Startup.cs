@@ -34,6 +34,7 @@ namespace AS.OCR.Api
         {
             services.AddControllers();
 
+            //支持SwaggerUI 并集成JWT  Bearer
             services.AddSwaggerGen(s =>
             {
                 s.SwaggerDoc("OCR", new OpenApiInfo
@@ -51,9 +52,7 @@ namespace AS.OCR.Api
                     Type = SecuritySchemeType.ApiKey
                 });
 
-                s.AddSecurityRequirement(
-                    new OpenApiSecurityRequirement
-                    {
+                s.AddSecurityRequirement(new OpenApiSecurityRequirement{
                         {
                         new OpenApiSecurityScheme{
                             Reference=new OpenApiReference{
@@ -63,15 +62,14 @@ namespace AS.OCR.Api
                         },
                         new string[]{ }
                         }
-                    }
-               );
+                    });
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 s.IncludeXmlComments(xmlPath);
             });
 
-            //添加jwt验证：
+            //jwt认证
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -90,7 +88,7 @@ namespace AS.OCR.Api
 
             services.AddAuthorization();
 
-            services.AddMvcCore(s => s.Filters.Add(typeof(AuthorizationFilter)))
+            services.AddMvcCore(s => s.Filters.Add(typeof(CustomActionFilter)))
                 .AddRazorViewEngine();
         }
 
@@ -131,8 +129,6 @@ namespace AS.OCR.Api
                 FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Script")),
                 RequestPath = "/Script"
             });
-
-            //app.UseMiddleware();
 
             app.UseEndpoints(endpoints =>
             {

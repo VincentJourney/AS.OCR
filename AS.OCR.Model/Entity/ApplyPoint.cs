@@ -9,68 +9,30 @@ namespace AS.OCR.Model.Entity
     [Table("ApplyPoint")]
     public class ApplyPoint : AbstractEntity
     {
-        [ExplicitKey]
-        public Guid ApplyPointID { get; set; }
-        public Guid MallID { get; set; }
-        public Guid StoreID { get; set; }
-        /// <summary>
-        /// 小票号
-        /// </summary>
+        public Guid AccountId { get; set; }
+        public Guid? MallId { get; set; }
+        public Guid? StoreId { get; set; }
         public string ReceiptNo { get; set; }
-        /// <summary>
-        /// 交易日期
-        /// </summary>
         public DateTime? TransDate { get; set; }
+        public decimal? TransAmt { get; set; }
+        public string MobileNO { get; set; }
+        public string UnionId { get; set; }
+        public string ImageUrl { get; set; }
         /// <summary>
-        /// 交易金额
+        /// 审核状态 0 未审核  1审核通过  2驳回
         /// </summary>
-        public decimal TransAmt { get; set; } = 0;
-        public Guid CardID { get; set; }
-        public string MobileNO { get; set; } = "";
-        public string Password { get; set; } = "";
+        public byte AuditStatus { get; set; }
+        public string Auditor { get; set; }
+        public DateTime AuditDate { get; set; }
+        public string Remark { get; set; }
+        public DateTime AddedOn { get; set; }
         /// <summary>
-        /// 小票图片
+        /// 校验状态 0 校验失败 1校验成功
         /// </summary>
-        public string ReceiptPhoto { get; set; } = "";
-
+        public byte VerifyStatus { get; set; }
         /// <summary>
-        /// 0 未审核  1 已审核  2  驳回
+        /// 识别状态 0 识别不完整 1 识别成功
         /// </summary>
-        public int Status { get; set; } = 1;
-        /// <summary>
-        /// 识别状态 0 未识别  1 已解析原始数据  2 成功完成关键字匹配 3 未成功完成关键字匹配
-        /// </summary>
-        public int RecongizeStatus { get; set; } = 1;
-        /// <summary>
-        /// 校验状态 0 校验失败 1 校验成功
-        /// </summary>
-        public int VerifyStatus { get; set; } = 0;
-
-        /// <summary>
-        /// 审批人
-        /// </summary>
-        public Guid Auditor { get; set; } = Guid.Empty;
-        /// <summary>
-        /// 审批时间  ： 当SourceType =7时，审批时间为校验完成时间
-        /// </summary>
-        public DateTime AuditDate { get; set; } = DateTime.Now;
-        /// <summary>
-        /// 来源类型 添加类型7=OCR引擎
-        /// </summary>
-        public int SourceType { get; set; } = 7;
-        /// <summary>
-        /// 激励日志Id
-        /// </summary>
-        public Guid RewardCyclelogID { get; set; } = Guid.Empty;
-        /// <summary>
-        /// 交易ID
-        /// </summary>
-        public Guid TransID { get; set; } = Guid.Empty;
-        public string Remark { get; set; } = "";
-        public int Enable { get; set; } = 1;
-        public DateTime AddedOn { get; set; } = DateTime.Now;
-
-        public string OriginReceiptNo { get; set; } = "";
-        public Guid? OrgID { get; set; }
+        public byte RecognitionStatus { get; set; }
     }
 }
