@@ -28,7 +28,12 @@ namespace AS.OCR.Api.Controllers
             _authService = authService;
         }
 
-
+        /// <summary>
+        /// 获取Token
+        /// </summary>
+        /// <param name="appid">账号id</param>
+        /// <param name="appsecret">账号秘钥</param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("Token")]
         public IActionResult Token(string appid, string appsecret)
@@ -39,6 +44,12 @@ namespace AS.OCR.Api.Controllers
             return SuccessRes(_authService.CreateToken(appid, appsecret));
         }
 
+        /// <summary>
+        /// 创建AppId,AppSecret
+        /// </summary>
+        /// <param name="name">用户名</param>
+        /// <param name="password">密码</param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("CreateAppIdSecret")]
         public IActionResult CreateAppIdSecret(string name, string password)
