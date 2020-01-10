@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AS.OCR.IService", "AS.OCR.I
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AS.OCR.IDAO", "AS.OCR.IDAO\AS.OCR.IDAO.csproj", "{D10DCD23-2F34-4261-A38A-82F212295D55}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AS.OCR.Application", "AS.OCR.Application", "{0CBD17CF-FE76-4F61-BB61-A65105956977}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
