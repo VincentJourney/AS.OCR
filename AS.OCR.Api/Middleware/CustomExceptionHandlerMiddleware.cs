@@ -15,9 +15,9 @@ namespace AS.OCR.Api.Middleware
     /// </summary>
     public class CustomExceptionHandlerMiddleware
     {
-        private readonly RequestDelegate _next;
+        private RequestDelegate _next { get; }
 
-        private readonly ILogger _log;
+        private ILogger _log { get; }
 
         public CustomExceptionHandlerMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
         {
