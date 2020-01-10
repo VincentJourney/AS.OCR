@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AS.OCR.Model.Business;
+using AS.OCR.IService;
 using AS.OCR.Model.Request;
-using AS.OCR.Model.Response;
-using AS.OCR.Service;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -18,12 +12,12 @@ namespace AS.OCR.Api.Controllers
     [Authorize]
     public class PointController : BaseController
     {
-        private ILogger _logger { get; set; }
-        private OCRService oCRService;
-        public PointController(ILoggerFactory loggerFactory)
+        private ILogger _logger { get; }
+        private IOCRService _oCRService;
+        public PointController(ILoggerFactory loggerFactory, IOCRService oCRService)
         {
             _logger = loggerFactory.CreateLogger(typeof(OCRController));
-            oCRService = new OCRService(loggerFactory);
+            _oCRService = oCRService;
         }
 
         /// <summary>

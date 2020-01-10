@@ -1,5 +1,4 @@
-﻿using AS.OCR.Commom.Util;
-using AS.OCR.Dapper;
+﻿using AS.OCR.Commom.Configuration;
 using AS.OCR.IDAO;
 using AS.OCR.IService;
 using AS.OCR.Model.Entity;
@@ -7,7 +6,6 @@ using AS.OCR.Model.Response;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;

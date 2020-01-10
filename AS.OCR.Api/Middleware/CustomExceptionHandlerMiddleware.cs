@@ -1,4 +1,4 @@
-﻿using AS.OCR.Commom.Util;
+﻿using AS.OCR.Commom.Configuration;
 using AS.OCR.Model.Response;
 using Exceptionless;
 using Microsoft.AspNetCore.Http;

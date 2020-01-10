@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-
-namespace AS.OCR.Model.Response
+﻿namespace AS.OCR.Model.Response
 {
     public class Result<T> where T : class
     {

@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration.Json;
 using System;
 
-namespace AS.OCR.Commom.Util
+namespace AS.OCR.Commom.Configuration
 {
     public static class ConfigurationUtil
     {

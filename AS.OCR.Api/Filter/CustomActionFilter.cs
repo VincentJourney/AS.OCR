@@ -1,16 +1,14 @@
-﻿using AS.OCR.Commom.Util;
+﻿using AS.OCR.Commom.Configuration;
+using AS.OCR.IService;
 using AS.OCR.Model.Business;
-using AS.OCR.Service;
 using Exceptionless;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace AS.OCR.Api.Filter
 {
@@ -18,11 +16,12 @@ namespace AS.OCR.Api.Filter
     {
         //private IExceptionLessLogger _logger { get; }
         private ILogger _Mlogger { get; }
-        public CustomActionFilter(ILoggerFactory loggerFactory)
+        private IAccountService _accountService { get; }
+        public CustomActionFilter(ILoggerFactory loggerFactory, IAccountService accountService)
         {
             _Mlogger = loggerFactory.CreateLogger(typeof(CustomActionFilter));
+            _accountService = accountService;
         }
-        private static readonly AccountService accountService = new AccountService();
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var isAllowAnonymous = context.ActionDescriptor.EndpointMetadata
@@ -38,7 +37,7 @@ namespace AS.OCR.Api.Filter
                 if (string.IsNullOrWhiteSpace(AccountId))
                     throw new Exception("找不到账号");
 
-                var account = accountService.Get(Guid.Parse(AccountId));
+                var account = _accountService.Get(Guid.Parse(AccountId));
                 if (account == null || account.Status == 0)
                     throw new Exception("账号不存在或账号未启用");
 

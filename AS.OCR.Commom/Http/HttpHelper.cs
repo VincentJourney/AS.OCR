@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace AS.OCR.Commom.Util
+namespace AS.OCR.Commom.Http
 {
     public static class HttpHelper
     {

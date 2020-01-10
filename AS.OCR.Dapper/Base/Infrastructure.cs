@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
-using System.Text;
+using AS.OCR.IDAO.Base;
 using Dapper.Contrib.Extensions;
 
 namespace AS.OCR.Dapper.Base
@@ -12,7 +10,7 @@ namespace AS.OCR.Dapper.Base
     /// 数据访问层 
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class Infrastructure<T> : BaseInterFace<T> where T : class
+    public class Infrastructure<T> : IBaseDAO<T> where T : class
     {
         /// <summary>
         /// 增

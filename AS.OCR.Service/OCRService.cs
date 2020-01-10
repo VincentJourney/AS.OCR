@@ -1,46 +1,36 @@
-﻿using AS.OCR.Commom.Util;
-using AS.OCR.Dapper.DAO;
-using AS.OCR.Extension.SDK.TencentOCR;
+﻿using AS.OCR.IDAO;
+using AS.OCR.IService;
 using AS.OCR.Model.Business;
-using AS.OCR.Model.Entity;
-using AS.OCR.Model.Enum;
 using AS.OCR.Model.Request;
-using AS.OCR.Model.Response;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using WebPos;
 
 namespace AS.OCR.Service
 {
-    public class OCRService : Infrastructure
+    public class OCRService : Infrastructure, IOCRService
     {
-        private ILogger logger;
-        private OCRLogDAO OCRLogDAO = new OCRLogDAO();
+        private ILogger _logger { get; }
+        private IOCRLogDAO _iOCRLogDAO { get; }
 
-        public OCRService(ILoggerFactory loggerFactory)
+        public OCRService(ILoggerFactory loggerFactory, IOCRLogDAO iOCRLogDAO)
         {
-            logger = loggerFactory.CreateLogger(typeof(OCRService));
+            _logger = loggerFactory.CreateLogger(typeof(OCRService));
+            _iOCRLogDAO = iOCRLogDAO;
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="oCRRequest"></param>
-        ///// <returns></returns>
-        //public async Task<ReceiptOCRResponse> ReceiptOCR(ReceiptRequest oCRRequest)
-        //{
-        //    var imageUrl = (oCRRequest.Type == null || oCRRequest.Type == 1) ? oCRRequest.imageUrl : "";
-        //    return await Task.Run(() =>
-        //        RecognitOCRResult(TencentOCR.GeneralAccurateOCR(oCRRequest.imageUrl, oCRRequest.Type),
-        //                          imageUrl));
-        //}
+        /// <returns></returns>
+        public ReceiptOCRResponse ReceiptOCR(ReceiptRequest oCRRequest)
+        {
+            var imageUrl = (oCRRequest.Type == null || oCRRequest.Type == 1) ? oCRRequest.imageUrl : "";
+            //return
+            //    RecognitOCRResult(TencentOCR.GeneralAccurateOCR(oCRRequest.imageUrl, oCRRequest.Type),
+            //                      imageUrl);
+            //_iOCRLogDAO.
+            return new ReceiptOCRResponse();
+        }
 
         ///// <summary>
         ///// 从OCR接口中 根据规则 获取详细内容 （暂无校验）

@@ -1,6 +1,6 @@
 using System;
 using AS.OCR.Api.Middleware;
-using AS.OCR.Commom.Util;
+using AS.OCR.Commom.Configuration;
 using Exceptionless;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -13,15 +13,8 @@ using System.IO;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Swashbuckle.AspNetCore.Swagger;
 using System.Text;
 using AS.OCR.Api.Filter;
-using AS.OCR.IService;
-using AS.OCR.Service;
-using AS.OCR.IDAO;
-using AS.OCR.Dapper;
 using AS.OCR.Api.IServiceCollectionExtension;
 
 namespace AS.OCR.Api

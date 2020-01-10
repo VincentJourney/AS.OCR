@@ -1,4 +1,4 @@
-﻿using AS.OCR.Commom.Util;
+﻿using AS.OCR.Commom.Configuration;
 using AS.OCR.Extension.SDK.EnterpriseWeChat;
 using AS.OCR.Model.Business;
 using System;

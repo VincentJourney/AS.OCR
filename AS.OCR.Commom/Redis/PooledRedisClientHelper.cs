@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using ServiceStack.Redis;
 using System.Linq;
 
-namespace AS.OCR.Commom.Util
+namespace AS.OCR.Commom.Configuration
 {
     public class PooledRedisClientHelper : IDisposable
     {

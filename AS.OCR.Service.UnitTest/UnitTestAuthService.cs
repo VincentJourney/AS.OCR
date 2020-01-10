@@ -1,9 +1,7 @@
-using AS.OCR.Service;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using AS.OCR.Model.Request;
 using AS.OCR.IDAO;
-using AS.OCR.Dapper;
+using AS.OCR.Dapper.DAO;
 
 namespace AS.OCR.Service.Tests
 {

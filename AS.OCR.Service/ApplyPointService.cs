@@ -1,13 +1,9 @@
-﻿using AS.OCR.Model.Request;
-using AS.OCR.Model.Response;
+﻿using AS.OCR.IService;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AS.OCR.Service
 {
-    public class ApplyPointService : Infrastructure
+    public class ApplyPointService : Infrastructure, IApplyPointService
     {
         private ILogger logger;
         public ApplyPointService(ILoggerFactory loggerFactory)

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AS.OCR.Commom;
 using AS.OCR.Commom.Attributes;
 
 namespace AS.OCR.Model.Business

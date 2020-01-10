@@ -1,14 +1,13 @@
 ﻿using AS.OCR.Commom.Attributes;
-using AS.OCR.Commom.Util;
+using AS.OCR.Commom.Configuration;
 using AS.OCR.Model.Request;
 using AS.OCR.Model.Response;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using AS.OCR.Model.Entity;
+using AS.OCR.Commom.Http;
 
 namespace AS.OCR.Service
 {

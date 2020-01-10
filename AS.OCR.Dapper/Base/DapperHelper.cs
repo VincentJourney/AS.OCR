@@ -1,5 +1,4 @@
-﻿using AS.OCR.Commom.Util;
-using System;
+﻿using AS.OCR.Commom.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 

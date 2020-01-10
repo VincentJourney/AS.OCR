@@ -1,21 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using AS.OCR.Extension.SDK.TencentOCR;
-using AS.OCR.Model.Business;
-using AS.OCR.Model.Entity;
+using AS.OCR.IService;
 using AS.OCR.Model.Request;
-using AS.OCR.Model.Response;
-using AS.OCR.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 
 namespace AS.OCR.Api.Controllers
 {
@@ -24,12 +15,12 @@ namespace AS.OCR.Api.Controllers
     [Authorize]
     public class OCRController : BaseController
     {
-        private ILogger _logger { get; set; }
-        private OCRService oCRService;
-        public OCRController(ILoggerFactory loggerFactory)
+        private ILogger _logger { get; }
+        private IOCRService _oCRService { get; }
+        public OCRController(ILoggerFactory loggerFactory, IOCRService oCRService)
         {
             _logger = loggerFactory.CreateLogger(typeof(OCRController));
-            oCRService = new OCRService(loggerFactory);
+            _oCRService = oCRService;
         }
 
         /// <summary>
@@ -38,7 +29,7 @@ namespace AS.OCR.Api.Controllers
         /// <param name="receiptRequest"></param>
         /// <returns></returns>
         [HttpPost("Receipt")]
-        public async Task<IActionResult> Receipt([FromBody]ReceiptRequest receiptRequest)
+        public IActionResult Receipt([FromBody]ReceiptRequest receiptRequest)
         {
             if (receiptRequest == null) throw new Exception("参数错误");
             //return SuccessRes(await oCRService.ReceiptOCR(receiptRequest));

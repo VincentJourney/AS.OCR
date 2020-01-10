@@ -13,6 +13,9 @@ namespace AS.OCR.Api.IServiceCollectionExtension
         public static IServiceCollection AddBusinessService(this IServiceCollection services)
         {
             services.AddTransient<IAuthService, AuthService>();
+            services.AddTransient<IApplyPointService, ApplyPointService>();
+            services.AddTransient<IAccountService, AccountService>();
+            services.AddTransient<IOCRService, OCRService>();
             return services;
         }
     }

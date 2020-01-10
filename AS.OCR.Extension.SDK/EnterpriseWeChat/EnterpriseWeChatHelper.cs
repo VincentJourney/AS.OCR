@@ -1,16 +1,14 @@
-﻿using AS.OCR.Commom.Util;
+﻿using AS.OCR.Commom.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using AS.OCR.Model.Response;
 using Newtonsoft.Json;
 using AS.OCR.Model.Request;
+using AS.OCR.Commom.Http;
 
 namespace AS.OCR.Extension.SDK.EnterpriseWeChat
 {
     public class EnterpriseWeChatHelper
     {
-        private static CacheHelper cacheHelper = new CacheHelper();
         private string corpid;
         private string corpsecret;
         private string token;
@@ -18,15 +16,18 @@ namespace AS.OCR.Extension.SDK.EnterpriseWeChat
         {
             corpid = CorpId;
             corpsecret = CorpSecret;
-            token = cacheHelper.Get<string>("WeChat_Token");
-            if (string.IsNullOrWhiteSpace(token))
+            if (!PooledRedisClientHelper.ContainsKey("WeChat_Token"))
             {
                 var result = GetToken(corpid, corpsecret);
                 if (result == null) throw new Exception("请求企业微信token失败");
                 if (result.errcode != 0) throw new Exception(result.errmsg);
                 if (string.IsNullOrWhiteSpace(result.access_token)) throw new Exception("请求企业微信token失败");
-                token = cacheHelper.GetValueByCache<string>("WeChat_Token", result.access_token, TimeSpan.FromSeconds(result.expires_in));
+                token = result.access_token;
+                PooledRedisClientHelper.Set<string>("WeChat_Token", result.access_token, TimeSpan.FromSeconds(result.expires_in));
             }
+            else
+                token = PooledRedisClientHelper.GetValueString("WeChat_Token");
+
         }
         /// <summary>
         /// 获取企业微信Token

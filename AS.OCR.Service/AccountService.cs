@@ -1,16 +1,19 @@
-﻿using AS.OCR.Dapper;
+﻿using AS.OCR.IDAO;
+using AS.OCR.IService;
 using AS.OCR.Model.Entity;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AS.OCR.Service
 {
-    public class AccountService : Infrastructure
+    public class AccountService : Infrastructure, IAccountService
     {
-        private static readonly AccountDAO accountDAO = new AccountDAO();
-        public Account GetByAppId(string AppId) => accountDAO.GetByAppId($"AppId='{AppId}'");
+        private IAccountDAO _accountDAO { get; }
+        public AccountService(IAccountDAO accountDAO)
+        {
+            _accountDAO = accountDAO;
+        }
+        public Account GetByAppId(string AppId) => _accountDAO.GetByAppId($"AppId='{AppId}'");
 
-        public Account Get(Guid Id) => accountDAO.Get(Id);
+        public Account Get(Guid Id) => _accountDAO.Get(Id);
     }
 }
