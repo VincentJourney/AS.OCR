@@ -143,6 +143,8 @@ namespace AS.OCR.Dapper.Base
             return DBContext.Query<T>($@"SELECT * FROM {typeof(T).Name} {sqlCondition}").ToList();
         }
 
+    
+
     }
 }
 

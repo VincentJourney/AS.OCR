@@ -1,7 +1,10 @@
 ﻿using AS.OCR.Commom.Util;
 using AS.OCR.Dapper;
+using AS.OCR.IDAO;
+using AS.OCR.IService;
 using AS.OCR.Model.Entity;
 using AS.OCR.Model.Response;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -11,13 +14,18 @@ using System.Text;
 
 namespace AS.OCR.Service
 {
-    public class AuthService : Infrastructure
+    public class AuthService : Infrastructure, IAuthService
     {
-        private static readonly AccountDAO accountDAO = new AccountDAO();
-
+        private ILogger _logger;
+        private IAccountDAO _accountDAO { get; }
+        public AuthService(ILoggerFactory loggerFactory, IAccountDAO accountDAO)
+        {
+            _logger = loggerFactory.CreateLogger(typeof(AuthService));
+            _accountDAO = accountDAO;
+        }
         public TokenResponse CreateToken(string appid, string appsecret)
         {
-            var account = accountDAO.GetByAppId(appid);
+            Account account = _accountDAO.GetByAppId(appid);
             if (account == null || account.AppSecret != appsecret || account.Status == 0)
                 throw new Exception("账号不存在或账号未启用");
 

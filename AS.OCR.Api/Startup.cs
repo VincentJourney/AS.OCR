@@ -17,6 +17,12 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Swashbuckle.AspNetCore.Swagger;
 using System.Text;
+using AS.OCR.Api.Filter;
+using AS.OCR.IService;
+using AS.OCR.Service;
+using AS.OCR.IDAO;
+using AS.OCR.Dapper;
+using AS.OCR.Api.IServiceCollectionExtension;
 
 namespace AS.OCR.Api
 {
@@ -87,6 +93,10 @@ namespace AS.OCR.Api
                 });
 
             services.AddAuthorization();
+            //×¢ÈëService²ã
+            services.AddBusinessService();
+            //×¢ÈëDAO²ã
+            services.AddBusinessDAO();
 
             services.AddMvcCore(s => s.Filters.Add(typeof(CustomActionFilter)))
                 .AddRazorViewEngine();

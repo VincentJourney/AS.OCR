@@ -12,7 +12,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace AS.OCR.Api.Middleware
+namespace AS.OCR.Api.Filter
 {
     public class CustomActionFilter : IAuthorizationFilter, IActionFilter
     {

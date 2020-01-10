@@ -41,7 +41,8 @@ namespace AS.OCR.Api.Controllers
         public async Task<IActionResult> Receipt([FromBody]ReceiptRequest receiptRequest)
         {
             if (receiptRequest == null) throw new Exception("参数错误");
-            return SuccessRes(await oCRService.ReceiptOCR(receiptRequest));
+            //return SuccessRes(await oCRService.ReceiptOCR(receiptRequest));
+            return SuccessRes("");
         }
 
         /// <summary>

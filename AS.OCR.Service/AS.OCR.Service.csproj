@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AS.OCR.Dapper\AS.OCR.Dapper.csproj" />
     <ProjectReference Include="..\AS.OCR.Extension.SDK\AS.OCR.Extension.SDK.csproj" />
+    <ProjectReference Include="..\AS.OCR.IService\AS.OCR.IService.csproj" />
     <ProjectReference Include="..\AS.OCR.Model\AS.OCR.Model.csproj" />
   </ItemGroup>
 

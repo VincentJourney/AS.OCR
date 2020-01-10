@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AS.OCR.Commom\AS.OCR.Commom.csproj" />
+    <ProjectReference Include="..\AS.OCR.IDAO\AS.OCR.IDAO.csproj" />
     <ProjectReference Include="..\AS.OCR.Model\AS.OCR.Model.csproj" />
   </ItemGroup>
 

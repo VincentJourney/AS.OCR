@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using AS.OCR.IService;
 using AS.OCR.Model.Response;
 using AS.OCR.Service;
 using Microsoft.AspNetCore.Authorization;
@@ -18,12 +19,13 @@ namespace AS.OCR.Api.Controllers
     //[Authorize]
     public class AuthController : BaseController
     {
-        private static readonly AuthService authService = new AuthService();
-        private ILogger logger;
+        private IAuthService _authService { get; }
+        private ILogger _logger;
 
-        public AuthController(ILoggerFactory loggerFactory)
+        public AuthController(ILoggerFactory loggerFactory, IAuthService authService)
         {
-            logger = loggerFactory.CreateLogger(typeof(AuthController));
+            _logger = loggerFactory.CreateLogger(typeof(AuthController));
+            _authService = authService;
         }
 
 
@@ -34,7 +36,7 @@ namespace AS.OCR.Api.Controllers
             if (string.IsNullOrWhiteSpace(appid) || string.IsNullOrWhiteSpace(appsecret))
                 return FailRes("参数错误");
 
-            return SuccessRes(authService.CreateToken(appid, appsecret));
+            return SuccessRes(_authService.CreateToken(appid, appsecret));
         }
 
         [AllowAnonymous]
