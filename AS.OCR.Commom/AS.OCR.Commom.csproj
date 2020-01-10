@@ -13,8 +13,4 @@
     <PackageReference Include="ServiceStack.Redis" Version="5.7.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Util\" />
-  </ItemGroup>
-
 </Project>
