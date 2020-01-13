@@ -46,23 +46,6 @@ namespace AS.OCR.Commom.Configuration
         /// </summary>
         public static string FileUploadUrl => GetConfig<string>("FileUploadUrl");
 
-        #region MQ
-        public static string RabbitMqHostName => GetConfig<string>("RabbitMq:HostName");
-        public static string RabbitMqPort => GetConfig<string>("RabbitMq:Port");
-        public static string RabbitMqUserName => GetConfig<string>("RabbitMq:UserName");
-        public static string RabbitMqPassword => GetConfig<string>("RabbitMq:Password");
-        #endregion
-
-        #region 缓存有效时间
-        //public static string CacheExpiration => GetConfig("CacheExpiration:AllMallOCRRule");
-        public static double CacheExpiration_StoreOCRDetailRuleList => GetConfig<double>("CacheExpiration:AllStoreOCRDetailRuleList");
-        public static double CacheExpiration_StoreOCR => GetConfig<double>("CacheExpiration:StoreOCR");
-        public static double CacheExpiration_Store => GetConfig<double>("CacheExpiration:Store");
-        public static double CacheExpiration_Company => GetConfig<double>("CacheExpiration:Company");
-        public static double CacheExpiration_OrgInfo => GetConfig<double>("CacheExpiration:OrgInfo");
-        public static double CacheExpiration_Mall => GetConfig<double>("CacheExpiration:Mall");
-        #endregion
-
         #region ExceptionLess
         public static bool Exceptionless_Enabled => GetConfig<bool>("Exceptionless:Enabled");
         public static string Exceptionless_ApiKey => GetConfig<string>("Exceptionless:ApiKey");
@@ -72,6 +55,12 @@ namespace AS.OCR.Commom.Configuration
         #region Redis配置项
         public static string RedisAddress => GetConfig<string>("Redis:RedisAddress");
         public static string RedisKey => GetConfig<string>("Redis:RedisKey");
+        public static string RedisKeySet_OCRVerifyRuleList => "RedisKeySet_OCRVerifyRuleList";
+        public static double RedisKeySet_OCRVerifyRuleList_expir => GetConfig<double>("Redis:RedisKeySet:OCRVerifyRuleList_expir");
+        public static string RedisKeySet_Store => "RedisKeySet_Store";
+        public static double RedisKeySet_Store_expir => GetConfig<double>("Redis:RedisKeySet:Store_expir");
+        public static string RedisKeySet_Mall => "RedisKeySet_Mall";
+        public static double RedisKeySet_Mall_expir => GetConfig<double>("Redis:RedisKeySet:Mall_expir");
         #endregion
 
         #region 企业微信配置项
@@ -80,29 +69,9 @@ namespace AS.OCR.Commom.Configuration
         public static string EnterpriseWeChat_Touser => GetConfig<string>("EnterpriseWeChat:Touser");
         public static int EnterpriseWeChat_AgentId => GetConfig<int>("EnterpriseWeChat:AgentId");
         #endregion
-
-        public static string TencentOCR_KingKey_HashId => GetConfig<string>("TencentOCR_KingKey:HashId");
-        public static string TencentOCR_KingKey_RedisKey => GetConfig<string>("TencentOCR_KingKey:RedisKey");
-        /// <summary>
-        /// 京基购买总次数
-        /// </summary>
-        public static int TencentOCR_KingKey_Total => GetConfig<int>("TencentOCR_KingKey:Total");
-        /// <summary>
-        /// 京基剩余N次数警告
-        /// </summary>
-        public static int TencentOCR_KingKey_Warning => GetConfig<int>("TencentOCR_KingKey:Warning");
-        /// <summary>
-        /// 京基警告评率（警告线下N次提醒一次）
-        /// </summary>
-        public static int TencentOCR_KingKey_WarningHz => GetConfig<int>("TencentOCR_KingKey:WarningHz");
         /// <summary>
         /// JWT token key
         /// </summary>
         public static string TokenKey { get => "2c85758f40ff400ab26e0616f6398c37"; }
-
-
-
-
-
     }
 }

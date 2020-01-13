@@ -2,6 +2,6 @@
 {
     public class ApplyPointHistoryRequest
     {
-        public string cardId { get; set; }
+        public string UnionId { get; set; }
     }
 }

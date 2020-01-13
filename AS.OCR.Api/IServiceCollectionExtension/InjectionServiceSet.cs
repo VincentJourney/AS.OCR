@@ -16,6 +16,7 @@ namespace AS.OCR.Api.IServiceCollectionExtension
             services.AddTransient<IApplyPointService, ApplyPointService>();
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IOCRService, OCRService>();
+            services.AddTransient<IStoreService, StoreService>();
             return services;
         }
     }

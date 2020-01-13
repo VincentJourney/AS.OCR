@@ -1,7 +1,7 @@
 ﻿using System;
 using AS.OCR.Commom.Attributes;
 
-namespace AS.OCR.Model.Business
+namespace AS.OCR.Model.Response
 {
     public class ReceiptOCRResponse
     {
@@ -17,5 +17,6 @@ namespace AS.OCR.Model.Business
         public decimal? TranAmount { get; set; }
         public Guid? AccountId { get; set; }
         public string AccountName { get; set; }
+        public string MallName { get; set; }
     }
 }

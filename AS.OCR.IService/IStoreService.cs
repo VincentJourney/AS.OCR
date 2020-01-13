@@ -4,8 +4,7 @@ using AS.OCR.Model.Response;
 
 namespace AS.OCR.IService
 {
-    public interface IOCRService
+    public interface IStoreService
     {
-        ReceiptOCRResponse ReceiptOCR(ReceiptRequest oCRRequest);
     }
 }

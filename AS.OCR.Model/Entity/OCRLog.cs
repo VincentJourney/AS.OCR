@@ -7,7 +7,7 @@ namespace AS.OCR.Model.Entity
     public class OCRLog : AbstractEntity
     {
         public Guid? ApplyId { get; set; }
-        public int ImageUrl { get; set; }
+        public string ImageUrl { get; set; }
         public string OriginalWords { get; set; }
         public Guid? StoreId { get; set; }
         public string StoreName { get; set; }

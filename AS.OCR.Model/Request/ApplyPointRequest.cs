@@ -1,4 +1,5 @@
 ﻿using AS.OCR.Model.Business;
+using AS.OCR.Model.Response;
 
 namespace AS.OCR.Model.Request
 {

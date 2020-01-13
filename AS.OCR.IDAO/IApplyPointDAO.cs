@@ -8,8 +8,10 @@ namespace AS.OCR.IDAO
 {
     public interface IApplyPointDAO : IBaseDAO<ApplyPoint>
     {
-        List<ApplyPointModel> GetApplyPointHistory(Guid cardId);
+        List<ApplyPointModel> GetApplyPointHistory(string UnionId);
 
-        int GetApplyPointCountByDay(Guid StoreId);
+        int GetApplyPointCountByDay(Guid? StoreId);
+
+        bool Exsist(string ReceiptNo, Guid? StoreId, DateTime? TransDatetime);
     }
 }

@@ -11,6 +11,7 @@ namespace AS.OCR.Api.IServiceCollectionExtension
             services.AddTransient<IAccountDAO, AccountDAO>();
             services.AddTransient<IApplyPointDAO, ApplyPointDAO>();
             services.AddTransient<IOCRLogDAO, OCRLogDAO>();
+            services.AddTransient<IStoreDAO, StoreDAO>();
             return services;
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using AS.OCR.IDAO;
 using AS.OCR.IService;
 using AS.OCR.Model.Request;
 using Microsoft.AspNetCore.Authorization;
@@ -13,11 +14,11 @@ namespace AS.OCR.Api.Controllers
     public class PointController : BaseController
     {
         private ILogger _logger { get; }
-        private IOCRService _oCRService;
-        public PointController(ILoggerFactory loggerFactory, IOCRService oCRService)
+        private IApplyPointDAO _applyPointDAO;
+        public PointController(ILoggerFactory loggerFactory, IApplyPointDAO applyPointDAO)
         {
             _logger = loggerFactory.CreateLogger(typeof(OCRController));
-            _oCRService = oCRService;
+            _applyPointDAO = applyPointDAO;
         }
 
         /// <summary>
@@ -41,29 +42,15 @@ namespace AS.OCR.Api.Controllers
         /// <summary>
         /// 积分申请历史记录
         /// </summary>
-        /// <param name="applyPointHistoryRequest"></param>
+        /// <param name="UnionId"></param>
         /// <returns></returns>
-        [HttpPost("ApplyPointHistory")]
-        public IActionResult ApplyPointHistory([FromBody]ApplyPointHistoryRequest applyPointHistoryRequest)
+        [HttpGet("ApplyPointHistory")]
+        public IActionResult ApplyPointHistory(string UnionId)
         {
-            //if (applyPointHistoryRequest == null) throw new Exception("参数错误");
-            //return SuccessRes(oCRService.GetApplePointByCardId(applyPointHistoryRequest));
+            if (string.IsNullOrWhiteSpace(UnionId))
+                return FailRes("参数错误");
 
-            return SuccessRes("");
-        }
-
-        /// <summary>
-        /// 自动积分并微信推送接口
-        /// </summary>
-        /// <param name="req"></param>
-        /// <returns></returns>
-        [HttpPost("WebPosForPoint")]
-        public IActionResult WebPosForPoint([FromBody]WebPosRequest req)
-        {
-            if (req == null || string.IsNullOrWhiteSpace(req.arg) || string.IsNullOrWhiteSpace(req.cardId))
-                throw new Exception("参数错误");
-            //return SuccessRes(oCRService.CommitApplyPoint(req));
-            return SuccessRes("");
+            return SuccessRes(_applyPointDAO.GetApplyPointHistory(UnionId));
         }
     }
 }

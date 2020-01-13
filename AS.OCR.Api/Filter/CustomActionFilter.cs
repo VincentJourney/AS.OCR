@@ -41,6 +41,9 @@ namespace AS.OCR.Api.Filter
                 if (account == null || account.Status == 0)
                     throw new Exception("账号不存在或账号未启用");
 
+                if (account.AppId != AppId || account.AppSecret != AppSecret)
+                    throw new Exception("账号AppId或AppSecret不匹配");
+
                 AccountInfo.Account = account;
             }
         }

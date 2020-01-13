@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AS.OCR.Model.Response;
+﻿using AS.OCR.Model.Response;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AS.OCR.Api.Controllers
