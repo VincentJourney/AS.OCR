@@ -158,7 +158,7 @@ namespace AS.OCR.Service
                 foreach (var StoreDetailRule in thisRule)
                 {
                     Result<string> ReturnResult = GetValue(WordList, i, StoreDetailRule); //根据规则取值
-                    if (ReturnResult.Success)
+                    if (ReturnResult.Code == 0)
                     {
                         var ReturnData = ReturnResult.Data.ToString();
                         if (!string.IsNullOrWhiteSpace(ReturnData))

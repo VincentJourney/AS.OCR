@@ -86,7 +86,7 @@ namespace AS.OCR.Service
 
             var VerifyRecognitionResult = VerifyRecognition(applyPointRequest.receiptOCR);//校验结果
             ApplyPoint.AuditDate = DateTime.Now;
-            if (!VerifyRecognitionResult.Success)//校验失败
+            if (VerifyRecognitionResult.HasError())//校验失败
             {
                 //ApplyPoint.RecongizeStatus = 3;
                 //ApplyPoint.VerifyStatus = 0;

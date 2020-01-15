@@ -8,8 +8,8 @@ namespace AS.OCR.Api.Controllers
         public IActionResult SuccessRes<T>(T Data = null, string Mes = "") where T : class
             => Ok(Result<T>.SuccessRes(Data, Mes));
 
-        public IActionResult FailRes<T>(T ErrorMes = null) where T : class
-            => BadRequest(Result<T>.ErrorRes(ErrorMes?.ToString()));
+        public IActionResult FailRes<T>(T ErrorMes = null, int code = 1001) where T : class
+            => BadRequest(Result<string>.FailRes(ErrorMes?.ToString(), code));
 
     }
 }

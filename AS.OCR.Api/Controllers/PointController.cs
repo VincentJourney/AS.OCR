@@ -52,5 +52,10 @@ namespace AS.OCR.Api.Controllers
 
             return SuccessRes(_applyPointDAO.GetApplyPointHistory(UnionId));
         }
+
+       // public IActionResult asd([FromServices])
+       // {
+       //     return SuccessRes("");
+       //}
     }
 }

@@ -39,8 +39,6 @@ namespace AS.OCR.Api.Middleware
 
         private async Task HandleExceptionAsync(HttpContext context, Exception e)
         {
-            if (e == null) return;
-
             var info = context.GetRequestInfo(ExceptionlessClient.Default.Configuration);
             var postData = info?.PostData?.ToString().Replace("\n", "").Replace(" ", "");
             var QueryString = JsonConvert.SerializeObject(info.QueryString);
@@ -59,7 +57,7 @@ namespace AS.OCR.Api.Middleware
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
             await context.Response
-                .WriteAsync(JsonConvert.SerializeObject(Result<string>.ErrorRes(e.Message)))
+                .WriteAsync(JsonConvert.SerializeObject(Result<string>.FailRes(e.Message)))
                 .ConfigureAwait(false);
         }
     }

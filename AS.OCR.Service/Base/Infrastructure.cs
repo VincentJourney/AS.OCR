@@ -127,8 +127,8 @@ namespace AS.OCR.Service
         }
 
         public static Result<T> SuccessRes<T>(T Data = null, string Mes = "") where T : class => Result<T>.SuccessRes(Data, Mes);
-        public static Result<T> FailRes<T>(string ErrorMes = "") where T : class => Result<T>.ErrorRes(ErrorMes);
-        public static Result<string> FailRes(string ErrorMes = "") => Result<string>.ErrorRes(ErrorMes);
+        public static Result<T> FailRes<T>(string ErrorMes = "") where T : class => Result<T>.FailRes(ErrorMes);
+        public static Result<string> FailRes(string ErrorMes = "") => Result<string>.FailRes(ErrorMes);
 
         /// <summary>
         /// 将时间转换为小程序所需时间戳格式  https://tool.lu/timestamp/

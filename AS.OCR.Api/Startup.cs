@@ -127,11 +127,11 @@ namespace AS.OCR.Api
             app.UseAuthorization();
 
             //更改默认静态文件目录
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Script")),
-                RequestPath = "/Script"
-            });
+            //app.UseStaticFiles(new StaticFileOptions
+            //{
+            //    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Script")),
+            //    RequestPath = "/Script"
+            //});
 
             app.UseEndpoints(endpoints =>
             {
